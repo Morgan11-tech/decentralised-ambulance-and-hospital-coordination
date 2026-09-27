@@ -1,0 +1,289 @@
+{
+  "$defs": {
+    "ClassificationSummary": {
+      "additionalProperties": false,
+      "description": "Classifier output that downstream agents may want to reason about.\n\nConfidences are 0..1, or null when no classifier confidence exists\n(e.g. Jev was unavailable, or the incident was generated synthetically).",
+      "properties": {
+        "incident_type_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Incident Type Confidence"
+        },
+        "severity_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Severity Confidence"
+        },
+        "consciousness_concern": {
+          "default": "uncertain",
+          "enum": [
+            "yes",
+            "no",
+            "uncertain"
+          ],
+          "title": "Consciousness Concern",
+          "type": "string"
+        },
+        "consciousness_concern_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Consciousness Concern Confidence"
+        },
+        "breathing_concern": {
+          "default": "uncertain",
+          "enum": [
+            "yes",
+            "no",
+            "uncertain"
+          ],
+          "title": "Breathing Concern",
+          "type": "string"
+        },
+        "breathing_concern_confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Breathing Concern Confidence"
+        },
+        "classifier": {
+          "description": "What produced the labels, e.g. \"jev-1.13.0\", \"unavailable\" or \"synthetic\".",
+          "title": "Classifier",
+          "type": "string"
+        }
+      },
+      "required": [
+        "classifier"
+      ],
+      "title": "ClassificationSummary",
+      "type": "object"
+    },
+    "Location": {
+      "additionalProperties": false,
+      "properties": {
+        "raw_text": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Raw Text"
+        },
+        "latitude": {
+          "anyOf": [
+            {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Latitude"
+        },
+        "longitude": {
+          "anyOf": [
+            {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Longitude"
+        }
+      },
+      "title": "Location",
+      "type": "object"
+    },
+    "PatientState": {
+      "additionalProperties": false,
+      "properties": {
+        "consciousness": {
+          "default": "unknown",
+          "enum": [
+            "conscious",
+            "altered",
+            "unconscious",
+            "unknown"
+          ],
+          "title": "Consciousness",
+          "type": "string"
+        },
+        "breathing": {
+          "default": "unknown",
+          "enum": [
+            "normal",
+            "abnormal",
+            "not_breathing",
+            "unknown"
+          ],
+          "title": "Breathing",
+          "type": "string"
+        },
+        "bleeding": {
+          "default": "unknown",
+          "enum": [
+            "none",
+            "present",
+            "severe",
+            "unknown"
+          ],
+          "title": "Bleeding",
+          "type": "string"
+        }
+      },
+      "title": "PatientState",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Canonical incident payload consumed by the Multi-Agent System.",
+  "properties": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "incident_id": {
+      "title": "Incident Id",
+      "type": "string"
+    },
+    "session_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Session Id"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "location": {
+      "$ref": "#/$defs/Location"
+    },
+    "incident_description": {
+      "minLength": 1,
+      "title": "Incident Description",
+      "type": "string"
+    },
+    "incident_type": {
+      "enum": [
+        "cardiac_or_circulatory",
+        "respiratory",
+        "trauma",
+        "neurological",
+        "bleeding",
+        "other",
+        "uncertain"
+      ],
+      "title": "Incident Type",
+      "type": "string"
+    },
+    "severity": {
+      "enum": [
+        "critical",
+        "urgent",
+        "non_urgent",
+        "uncertain"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "patient": {
+      "$ref": "#/$defs/PatientState"
+    },
+    "number_of_patients": {
+      "anyOf": [
+        {
+          "minimum": 1,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Number Of Patients"
+    },
+    "classification": {
+      "$ref": "#/$defs/ClassificationSummary"
+    },
+    "source": {
+      "enum": [
+        "voice_agent",
+        "synthetic_generator"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "status": {
+      "const": "ready_for_dispatch",
+      "default": "ready_for_dispatch",
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "location",
+    "incident_description",
+    "incident_type",
+    "severity",
+    "patient",
+    "classification",
+    "source"
+  ],
+  "title": "Incident",
+  "type": "object"
+}

@@ -1,0 +1,27 @@
+# Local MongoDB for the conversational agent (development / demo only).
+#
+#   docker compose up -d      start MongoDB in the background
+#   docker compose down       stop it (stored incidents are kept in the volume)
+#   docker compose down -v    stop it AND delete all stored incidents
+#
+# Matching .env setting:  MONGODB_URI=mongodb://localhost:27017
+#
+# No username/password: the port is bound to 127.0.0.1, so the database is only
+# reachable from this computer. Do not expose it on a network.
+
+services:
+  mongodb:
+    image: mongo:8.0
+    ports:
+      - "127.0.0.1:27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+volumes:
+  mongo-data:

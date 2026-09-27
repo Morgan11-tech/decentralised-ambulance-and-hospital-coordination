@@ -1,0 +1,13 @@
+# Environment files with secrets (keep the example)
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# OS / editor noise
+.DS_Store
