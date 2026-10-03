@@ -8,7 +8,16 @@ from fastapi.testclient import TestClient
 import main
 from intake_agent import IntakeAgent
 from prompts.emergency_agent import CLOSING_MESSAGE, GREETING
-from tests.test_intake_agent import COMPLETE, SETTINGS, Fakes, classification, turn
+from tests.fakes import Fakes, ask, classification, turn
+
+COMPLETE = dict(
+    location="Outside the Vrijhof, University of Twente",
+    incident_description="Cyclist fell off his bicycle and hit his head.",
+    patient_count=1,
+    consciousness="conscious",
+    breathing="normal",
+    severe_bleeding="absent",
+)
 
 
 def receive_until(ws, event_type, **match):
@@ -21,58 +30,56 @@ def receive_until(ws, event_type, **match):
             return seen
 
 
+def use_fakes(monkeypatch, fakes: Fakes) -> TestClient:
+    monkeypatch.setattr(main, "IntakeAgent", partial(IntakeAgent, **fakes.agent_kwargs()))
+    return TestClient(main.app)
+
+
 def test_text_mode_conversation(monkeypatch):
-    fakes = Fakes(
-        turns=[turn("What is your location?", incident_description="Cyclist fell."), turn("Thanks.", ready=True, **COMPLETE)],
-        results=[classification(0.9)],
-    )
-    monkeypatch.setattr(
-        main, "IntakeAgent",
-        partial(IntakeAgent, llm=fakes.llm, classifier=fakes.classifier, store=fakes.store, settings=SETTINGS),
-    )
-    client = TestClient(main.app)
+    fakes = Fakes(turns=[turn(incident_description="Cyclist fell."), turn(**COMPLETE)], results=[classification(0.9)])
+    client = use_fakes(monkeypatch, fakes)
     session_id = client.post("/api/session").json()["session_id"]
 
     with client.websocket_connect(f"/ws/voice/{session_id}") as ws:
         ws.send_json({"type": "start", "mode": "text"})
         events = receive_until(ws, "state", state="listening")
         assert {"type": "agent_response", "text": GREETING} in events
+        assert next(e for e in events if e["type"] == "incident_state")["next_topic"] == "location"
 
         ws.send_json({"type": "user_text", "text": "My friend fell off his bike."})
         events = receive_until(ws, "state", state="listening")
         assert {"type": "transcript", "speaker": "user", "text": "My friend fell off his bike.", "final": True} in events
-        assert {"type": "agent_response", "text": "What is your location?"} in events
-        assert any(e["type"] == "incident_state" for e in events)
+        assert {"type": "agent_response", "text": ask("location")} in events
+        live = next(e for e in events if e["type"] == "incident_state")
+        assert live["incident"]["incident"]["description"] == "Cyclist fell."
 
-        ws.send_json({"type": "user_text", "text": "University of Twente."})
+        ws.send_json({"type": "user_text", "text": "Outside the Vrijhof."})
         events = receive_until(ws, "state", state="completed")
         types = [e["type"] for e in events]
         assert "classification" in types
         complete = next(e for e in events if e["type"] == "incident_complete")
         assert complete["persisted"] is True
+        assert complete["incident"]["incident"]["type"] == "trauma"
         assert {"type": "agent_response", "text": CLOSING_MESSAGE} in events
 
     incident_id = complete["incident"]["incident_id"]
     monkeypatch.setattr(main.mongodb_service, "get_incident_document", _raise)
     response = client.get(f"/api/incidents/{incident_id}")  # falls back to memory
     assert response.status_code == 200
-    assert response.json()["incident"]["incident_type"] == "trauma"
+    assert response.json()["incident"]["incident"]["type"] == "trauma"
 
 
 def test_end_while_agent_is_thinking(monkeypatch):
     """Ending mid-turn lets the turn finish silently, then saves what is known."""
-    fakes = Fakes(turns=[turn("What is your location?", incident_description="Dad collapsed.")], results=[classification(0.9)])
+    fakes = Fakes(turns=[turn(incident_description="Dad collapsed.")], results=[classification(0.9)])
     real_llm = fakes.llm
 
     async def slow_llm(prompt):
         await asyncio.sleep(0.2)
         return await real_llm(prompt)
 
-    monkeypatch.setattr(
-        main, "IntakeAgent",
-        partial(IntakeAgent, llm=slow_llm, classifier=fakes.classifier, store=fakes.store, settings=SETTINGS),
-    )
-    client = TestClient(main.app)
+    fakes.llm = slow_llm
+    client = use_fakes(monkeypatch, fakes)
     session_id = client.post("/api/session").json()["session_id"]
 
     with client.websocket_connect(f"/ws/voice/{session_id}") as ws:
@@ -84,7 +91,7 @@ def test_end_while_agent_is_thinking(monkeypatch):
         events = receive_until(ws, "session_ended")
 
     assert events[-1] == {"type": "session_ended", "incident_saved": True}
-    assert {"type": "agent_response", "text": "What is your location?"} not in events
+    assert {"type": "agent_response", "text": ask("location")} not in events
     assert len(fakes.stored) == 1
 
 

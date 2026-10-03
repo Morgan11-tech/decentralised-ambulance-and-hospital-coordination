@@ -70,4 +70,11 @@ Start Docker Desktop, then:
 
 ```bash
 cd conversational-agent/backend && source .venv/bin/activate && pytest
+RUN_LIVE_TESTS=1 pytest tests/test_live_scenarios.py -s   # optional: scenarios against the real Gemini/Jev
 ```
+
+## Incident JSON contract (for the Mesa simulation)
+
+- [docs/incident-schema.md](docs/incident-schema.md): every field and enum
+- [docs/mesa-integration.md](docs/mesa-integration.md): how to load and use incidents
+- [examples/sample_incident.json](examples/sample_incident.json) and [schemas/incident.schema.json](schemas/incident.schema.json)

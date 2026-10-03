@@ -1,23 +1,69 @@
-// Mirrors backend/models/*.py. The canonical schema lives in schemas/incident.schema.json.
+// Mirrors backend/models/*.py. The canonical contract is documented in docs/incident-schema.md.
 
 export type AgentStatus = "idle" | "listening" | "thinking" | "speaking" | "completed" | "error";
 
-export interface PatientState {
-  consciousness: "conscious" | "altered" | "unconscious" | "unknown";
-  breathing: "normal" | "abnormal" | "not_breathing" | "unknown";
-  bleeding: "none" | "present" | "severe" | "unknown";
+// --- Canonical Incident (the contract with the Mesa simulation) ---------------------
+
+export interface LabeledValue {
+  value: string;
+  confidence: number | null;
 }
 
-export interface IncidentState {
-  location: string | null;
-  incident_description: string | null;
-  conversation_summary: string | null;
-  patient: PatientState;
-  number_of_patients: number | null;
-  incident_type: string;
-  severity: string;
-  status: "collecting" | "classifying" | "clarifying" | "completed";
+export interface Incident {
+  schema_version: string;
+  incident_id: string;
+  session_id: string | null;
+  created_at: string | null; // null only in live drafts
+  source: "voice_agent" | "synthetic_generator";
+  location: { raw_text: string | null; latitude: number | null; longitude: number | null };
+  incident: { description: string | null; mechanism: string | null; type: string; severity: string };
+  patients: {
+    count: number | null;
+    primary_patient: {
+      consciousness: string;
+      breathing: string;
+      severe_bleeding: string;
+      symptoms: string[];
+    };
+  };
+  scene: { entrapment: string; immediate_danger: string };
+  classification: Record<"incident_type" | "severity" | "consciousness_concern" | "breathing_concern", LabeledValue>;
+  status: "collecting" | "ready_for_dispatch"; // "collecting" = live draft, never sent to the MAS
 }
+
+export interface CompletedIncident {
+  incident: Incident;
+  persisted: boolean;
+  persistence_error: string | null;
+}
+
+// --- Working state (internal, debug only) ---------------------------------------------
+
+export type Topic =
+  | "location"
+  | "what_happened"
+  | "consciousness"
+  | "breathing"
+  | "severe_bleeding"
+  | "patient_count"
+  | "entrapment"
+  | "immediate_danger";
+
+export interface TopicView {
+  topic: Topic;
+  status: "known" | "next" | "missing" | "unanswered" | "not_relevant";
+  value: string | number | null;
+}
+
+/** The working state is shown as raw JSON, so only its envelope is typed. */
+export interface WorkingState {
+  session_id: string;
+  incident_id: string;
+  status: "collecting" | "classifying" | "clarifying" | "completed";
+  [key: string]: unknown;
+}
+
+// --- Debug views ------------------------------------------------------------------------
 
 export interface LabelView {
   value: string;
@@ -33,28 +79,6 @@ export interface ClassificationRun {
   threshold: number;
   labels: Record<"incident_type" | "severity" | "consciousness_concern" | "breathing_concern", LabelView>;
   uncertain_fields: string[];
-}
-
-export interface Incident {
-  schema_version: string;
-  incident_id: string;
-  session_id: string | null;
-  created_at: string;
-  location: { raw_text: string | null; latitude: number | null; longitude: number | null };
-  incident_description: string;
-  incident_type: string;
-  severity: string;
-  patient: PatientState;
-  number_of_patients: number | null;
-  classification: Record<string, string | number | null>;
-  source: "voice_agent" | "synthetic_generator";
-  status: "ready_for_dispatch";
-}
-
-export interface CompletedIncident {
-  incident: Incident;
-  persisted: boolean;
-  persistence_error: string | null;
 }
 
 export interface TranscriptLine {
@@ -74,7 +98,7 @@ export type ServerEvent =
   | { type: "transcript"; speaker: "user"; text: string; final: boolean }
   | { type: "agent_response"; text: string }
   | { type: "audio"; format: "wav"; data: string }
-  | { type: "incident_state"; state: IncidentState }
+  | { type: "incident_state"; state: WorkingState; topics: TopicView[]; next_topic: Topic | null; incident: Incident }
   | { type: "classification"; data: ClassificationRun }
   | ({ type: "incident_complete" } & CompletedIncident)
   | ({ type: "error" } & AgentErrorInfo)

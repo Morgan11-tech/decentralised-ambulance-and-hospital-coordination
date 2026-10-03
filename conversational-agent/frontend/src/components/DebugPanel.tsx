@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { VoiceAgentState } from "../hooks/useVoiceAgent";
-import type { ClassificationRun } from "../types/incident";
+import type { ClassificationRun, Topic, TopicView } from "../types/incident";
 
 interface Props {
   open: boolean;
@@ -11,6 +11,13 @@ interface Props {
 
 export default function DebugPanel({ open, onClose, agent, onSendText }: Props) {
   const latestRun = agent.classifications.at(-1);
+  const incident = agent.completed?.incident ?? agent.liveIncident;
+  const persistText = !agent.completed
+    ? "Live draft · becomes final when the call completes"
+    : agent.completed.persisted
+      ? "Final · persisted to MongoDB"
+      : `Final · not persisted: ${agent.completed.persistence_error ?? "unknown error"}`;
+  const persistClass = !agent.completed ? "debug__persist--draft" : agent.completed.persisted ? "" : "debug__persist--fail";
 
   return (
     <aside className={`debug ${open ? "debug--open" : ""}`} aria-hidden={!open} inert={!open}>
@@ -27,26 +34,26 @@ export default function DebugPanel({ open, onClose, agent, onSendText }: Props) 
           <TextInput enabled={agent.status === "listening"} onSend={onSendText} />
         </Section>
 
-        <Section title="Current incident state" defaultOpen>
-          <Json value={agent.incidentState} empty="Nothing collected yet." />
+        <Section title="Information needed" defaultOpen>
+          {agent.topics.length ? <Topics topics={agent.topics} /> : <p className="debug__empty">Starts with the call.</p>}
+        </Section>
+
+        <Section title="Live working state" defaultOpen>
+          {agent.workingState ? <LiveJson value={agent.workingState} /> : <p className="debug__empty">Nothing collected yet.</p>}
         </Section>
 
         <Section title="Jev classification" count={agent.classifications.length} defaultOpen>
           {latestRun ? <Classification run={latestRun} /> : <p className="debug__empty">Not classified yet.</p>}
         </Section>
 
-        <Section title="Incident JSON" defaultOpen={!!agent.completed}>
-          {agent.completed ? (
+        <Section title="Incident JSON · Mesa contract" defaultOpen>
+          {incident ? (
             <>
-              <p className={`debug__persist ${agent.completed.persisted ? "" : "debug__persist--fail"}`}>
-                {agent.completed.persisted
-                  ? "Persisted to MongoDB"
-                  : `Not persisted: ${agent.completed.persistence_error ?? "unknown error"}`}
-              </p>
-              <Json value={agent.completed.incident} copyable />
+              <p className={`debug__persist ${persistClass}`}>{persistText}</p>
+              <LiveJson value={incident} copyable={!!agent.completed} />
             </>
           ) : (
-            <p className="debug__empty">Created when the conversation completes.</p>
+            <p className="debug__empty">Fills up as the caller answers.</p>
           )}
         </Section>
 
@@ -172,15 +179,52 @@ function Classification({ run }: { run: ClassificationRun }) {
   );
 }
 
-function Json({ value, empty, copyable }: { value: unknown; empty?: string; copyable?: boolean }) {
-  const [copied, setCopied] = useState(false);
-  if (value === null || value === undefined) return <p className="debug__empty">{empty}</p>;
+const TOPIC_LABELS: Record<Topic, string> = {
+  location: "Location",
+  what_happened: "What happened",
+  consciousness: "Responsive",
+  breathing: "Breathing",
+  severe_bleeding: "Severe bleeding",
+  patient_count: "Patients",
+  entrapment: "Trapped",
+  immediate_danger: "Scene danger",
+};
+
+const STATUS_TEXT: Record<TopicView["status"], string> = {
+  known: "",
+  next: "asking now",
+  missing: "missing",
+  unanswered: "caller unsure",
+  not_relevant: "not relevant",
+};
+
+function Topics({ topics }: { topics: TopicView[] }) {
+  return (
+    <ul className="topics">
+      {topics.map((t) => (
+        <li key={t.topic} className={`topic topic--${t.status}`}>
+          <span>{TOPIC_LABELS[t.topic]}</span>
+          <em>{t.status === "known" ? String(t.value) : STATUS_TEXT[t.status]}</em>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Pretty JSON where lines that changed since the previous update briefly light up. */
+function LiveJson({ value, copyable }: { value: unknown; copyable?: boolean }) {
   const text = JSON.stringify(value, null, 2);
+  const [snapshot, setSnapshot] = useState({ current: text, previous: text });
+  if (snapshot.current !== text) setSnapshot({ current: text, previous: snapshot.current });
+  const before = useMemo(() => new Set(snapshot.previous.split("\n")), [snapshot.previous]);
+  const [copied, setCopied] = useState(false);
+
   const copy = async () => {
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
+
   return (
     <div className="json">
       {copyable && (
@@ -188,7 +232,13 @@ function Json({ value, empty, copyable }: { value: unknown; empty?: string; copy
           {copied ? "Copied" : "Copy"}
         </button>
       )}
-      <pre>{text}</pre>
+      <pre>
+        {text.split("\n").map((line, i) => (
+          <span key={`${i}:${line}`} className={before.has(line) ? "json__line" : "json__line json__line--changed"}>
+            {line}
+          </span>
+        ))}
+      </pre>
     </div>
   );
 }

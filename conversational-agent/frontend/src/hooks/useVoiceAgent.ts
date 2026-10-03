@@ -6,9 +6,11 @@ import type {
   AgentStatus,
   ClassificationRun,
   CompletedIncident,
-  IncidentState,
+  Incident,
   ServerEvent,
+  TopicView,
   TranscriptLine,
+  WorkingState,
 } from "../types/incident";
 import { MicrophoneDeniedError, useMicrophone } from "./useMicrophone";
 
@@ -20,7 +22,10 @@ export interface VoiceAgentState {
   agentText: string;
   interimText: string;
   transcript: TranscriptLine[];
-  incidentState: IncidentState | null;
+  /** Live working state, information checklist and draft Incident JSON (debug panel). */
+  workingState: WorkingState | null;
+  topics: TopicView[];
+  liveIncident: Incident | null;
   classifications: ClassificationRun[];
   completed: CompletedIncident | null;
   errorLog: AgentErrorInfo[];
@@ -40,7 +45,9 @@ const initialState: VoiceAgentState = {
   agentText: "",
   interimText: "",
   transcript: [],
-  incidentState: null,
+  workingState: null,
+  topics: [],
+  liveIncident: null,
   classifications: [],
   completed: null,
   errorLog: [],
@@ -84,7 +91,7 @@ function applyEvent(state: VoiceAgentState, event: ServerEvent): VoiceAgentState
         transcript: [...state.transcript, { speaker: "agent", text: event.text }],
       };
     case "incident_state":
-      return { ...state, incidentState: event.state };
+      return { ...state, workingState: event.state, topics: event.topics, liveIncident: event.incident };
     case "classification":
       return { ...state, classifications: [...state.classifications, event.data] };
     case "incident_complete":

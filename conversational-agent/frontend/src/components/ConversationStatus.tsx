@@ -47,7 +47,7 @@ export default function ConversationStatus({ status, agentText, interimText, err
       {status === "completed" && completed && (
         <p className={`caption__meta ${completed.persisted ? "" : "caption__meta--warn"}`}>
           {completed.persisted
-            ? `Stored in MongoDB · ${completed.incident.incident_id.slice(0, 8)}`
+            ? `Stored in MongoDB · ${completed.incident.incident_id}`
             : "Incident created, but saving to MongoDB failed. It is kept in memory. See the debug panel."}
         </p>
       )}

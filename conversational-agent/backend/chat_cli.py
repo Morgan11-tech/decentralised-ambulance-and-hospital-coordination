@@ -18,7 +18,12 @@ from intake_agent import AgentError, IntakeAgent
 async def print_event(event: dict) -> None:
     kind = event["type"]
     if kind == "incident_state":
-        print(f"  [state] {json.dumps(event['state'])}")
+        topics = ", ".join(
+            f"{t['topic']}={t['value'] if t['status'] == 'known' else t['status']}" for t in event["topics"]
+        )
+        print(f"  [state] {topics}")
+        if event["state"]["patient_state"]["symptoms"]:
+            print(f"  [state] symptoms: {event['state']['patient_state']['symptoms']}")
     elif kind == "classification":
         for name, label in event["data"]["labels"].items():
             print(f"  [jev] {name}: {label['value']} (confidence {label['confidence']}) -> {label['final']}")

@@ -1,10 +1,11 @@
 """The intake agent's decision loop.
 
-    caller text -> Gemini (update state, next question)
-                -> incomplete?  ask next question
-                -> complete?    Jev classification
-                                 -> low confidence (once)?  clarification question
-                                 -> otherwise               build Incident -> MongoDB
+    caller text -> Gemini: extract ALL facts + phrase questions for what is still needed
+                -> merge into the live working state            (intake_policy.merge_turn)
+                -> something relevant missing?  ask ONE question (intake_policy.next_topic)
+                -> nothing missing?             Jev classification -> enrich the same state
+                                                 -> low confidence (once)?  clarification question
+                                                 -> otherwise               canonical Incident -> MongoDB
 
 This class knows nothing about audio or WebSockets: it takes caller text and
 returns what the agent should say next. `main.py` wires it to voice, and the
@@ -15,9 +16,20 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 
 from config import Settings, get_settings
+from intake_policy import (
+    FALLBACK_QUESTIONS,
+    apply_classification,
+    build_incident,
+    incident_payload,
+    merge_turn,
+    missing_information,
+    next_topic,
+    topic_overview,
+)
 from models.classification import CLASSIFICATION_FIELDS, ClassificationResult
 from models.conversation import GeminiTurn, TranscriptEntry
-from models.incident import ClassificationSummary, Incident, IncidentState, Location
+from models.incident import Incident
+from models.working_state import Topic, WorkingState
 from prompts.emergency_agent import (
     CLOSING_MESSAGE,
     GREETING,
@@ -34,7 +46,7 @@ FALLBACK_CLARIFICATIONS = {
     "incident_type": "Can you tell me a bit more about what happened to the patient?",
     "severity": "How is the patient doing right now?",
     "consciousness_concern": "Is the patient awake and responding to you?",
-    "breathing_concern": "Is the patient breathing normally?",
+    "breathing_concern": "Is the patient breathing normally right now?",
 }
 
 Emit = Callable[[dict], Awaitable[None]]
@@ -52,53 +64,6 @@ class AgentError(Exception):
 class AgentReply:
     text: str
     done: bool = False
-
-
-def merge_gemini_turn(state: IncidentState, turn: GeminiTurn) -> IncidentState:
-    """Merge Gemini's view into the working state.
-
-    New information overrides old values, but null/"unknown" never erases
-    something the caller already told us.
-    """
-    merged = state.model_copy(deep=True)
-    if turn.location:
-        merged.location = turn.location
-    if turn.incident_description:
-        merged.incident_description = turn.incident_description
-    if turn.conversation_summary:
-        merged.conversation_summary = turn.conversation_summary
-    if turn.number_of_patients is not None and turn.number_of_patients >= 1:
-        merged.number_of_patients = turn.number_of_patients
-    for field in ("consciousness", "breathing", "bleeding"):
-        value = getattr(turn, field)
-        if value != "unknown":
-            setattr(merged.patient, field, value)
-    return merged
-
-
-def build_incident(
-    state: IncidentState, result: ClassificationResult, threshold: float
-) -> Incident:
-    """Build the canonical Incident payload from the working state + classification."""
-    return Incident(
-        session_id=state.session_id,
-        location=Location(raw_text=state.location),
-        incident_description=state.incident_description or "No description provided by caller.",
-        incident_type=result.incident_type.final_value(threshold),
-        severity=result.severity.final_value(threshold),
-        patient=state.patient.model_copy(),
-        number_of_patients=state.number_of_patients,
-        classification=ClassificationSummary(
-            incident_type_confidence=result.incident_type.confidence,
-            severity_confidence=result.severity.confidence,
-            consciousness_concern=result.consciousness_concern.final_value(threshold),
-            consciousness_concern_confidence=result.consciousness_concern.confidence,
-            breathing_concern=result.breathing_concern.final_value(threshold),
-            breathing_concern_confidence=result.breathing_concern.confidence,
-            classifier=result.model or "unavailable",
-        ),
-        source="voice_agent",
-    )
 
 
 def classification_event(result: ClassificationResult, threshold: float, run: int) -> dict:
@@ -127,18 +92,20 @@ class IntakeAgent:
         session_id: str,
         emit: Emit,
         *,
-        llm: Callable[[str], Awaitable[GeminiTurn]] = gemini_service.generate_turn,
+        llm: Callable[[str], Awaitable[GeminiTurn]] = gemini_service.extract_turn,
+        clarifier: Callable[[str], Awaitable[str]] = gemini_service.generate_clarification,
         classifier=jev_service.classify,
         store=mongodb_service.save_incident,
         settings: Settings | None = None,
     ):
         self.emit = emit
         self.llm = llm
+        self.clarifier = clarifier
         self.classifier = classifier
         self.store = store
         self.settings = settings or get_settings()
 
-        self.state = IncidentState(session_id=session_id)
+        self.state = WorkingState(session_id=session_id)
         self.transcript: list[TranscriptEntry] = []
         self.questions_asked = 0
         self.clarifications_used = 0
@@ -165,6 +132,7 @@ class IntakeAgent:
 
     async def start(self) -> AgentReply:
         await self._say(GREETING)
+        await self._emit_state(asking="location")
         return AgentReply(GREETING)
 
     async def handle_caller_text(self, text: str) -> AgentReply:
@@ -182,31 +150,41 @@ class IntakeAgent:
         Returns False if there was nothing useful to save."""
         if self.done:
             return True
-        if not self.state.incident_description:
+        if self.state.incident.description.status != "known":
             return False
-        result = await self._classify()
-        await self._finalize(result)
+        await self._classify()
+        await self._finalize()
         return True
 
     # --- decision loop ------------------------------------------------------------
 
     async def _process(self) -> AgentReply:
         turn = await self._call_llm(
-            build_turn_prompt(self._state_dict(), self._transcript_dicts(), self.questions_asked)
+            build_turn_prompt(
+                self.state.model_dump(),
+                self._transcript_dicts(),
+                missing_information(self.state),
+                self.state.asked_topics,
+            )
         )
-        self.state = merge_gemini_turn(self.state, turn)
-        await self.emit({"type": "incident_state", "state": self.state.model_dump()})
+        self.state = merge_turn(self.state, turn, turn_no=self._caller_turns())
 
         if self.state.status == "clarifying":
             # The caller just answered our one clarification question.
+            await self._emit_state(asking=None)
             return await self._classify_and_finish(allow_clarification=False)
 
-        if turn.ready_for_classification or self.questions_asked >= MAX_INTAKE_QUESTIONS:
+        topic = next_topic(self.state)
+        if topic is None or self.questions_asked >= MAX_INTAKE_QUESTIONS:
+            await self._emit_state(asking=None)
             return await self._classify_and_finish(allow_clarification=True)
 
-        await self._say(turn.reply)
+        await self._emit_state(asking=topic)
+        question = self._question(turn, topic)
+        self.state.asked_topics.append(topic)
+        await self._say(question)
         self.questions_asked += 1
-        return AgentReply(turn.reply)
+        return AgentReply(question)
 
     async def _classify_and_finish(self, allow_clarification: bool) -> AgentReply:
         result = await self._classify()
@@ -225,7 +203,7 @@ class IntakeAgent:
             return AgentReply(question)
 
         await self._say(CLOSING_MESSAGE)
-        await self._finalize(result)
+        await self._finalize()
         return AgentReply(CLOSING_MESSAGE, done=True)
 
     async def _classify(self) -> ClassificationResult:
@@ -238,9 +216,12 @@ class IntakeAgent:
         self.state.status = previous_status
         if raw is not None:
             self.jev_raw.append(raw)
+
+        apply_classification(self.state, result, self.threshold)  # enrich the same state
         event = classification_event(result, self.threshold, run=len(self.classification_runs) + 1)
         self.classification_runs.append(event)
         await self.emit({"type": "classification", "data": event})
+        await self._emit_state(asking=None)
         if result.error:
             await self.emit(
                 {"type": "error", "source": "jev", "message": result.error, "recoverable": True}
@@ -249,40 +230,55 @@ class IntakeAgent:
 
     async def _clarification_question(self, uncertain: list[str]) -> str:
         prompt = build_clarification_prompt(
-            self._state_dict(), self._transcript_dicts(), uncertain
+            self.state.model_dump(), self._transcript_dicts(), uncertain
         )
         try:
-            turn = await self.llm(prompt)
-            if turn.reply.strip():
-                return turn.reply
+            question = (await self.clarifier(prompt)).strip()
+            if question:
+                return question
         except Exception:
             pass
         return FALLBACK_CLARIFICATIONS[uncertain[0]]
 
-    async def _finalize(self, result: ClassificationResult) -> None:
-        incident = build_incident(self.state, result, self.threshold)
-        self.incident = incident
-        self.state.incident_type = incident.incident_type
-        self.state.severity = incident.severity
+    async def _finalize(self) -> None:
+        self.incident = build_incident(self.state)
         self.state.status = "completed"
 
         try:
-            await self.store(incident, self._metadata())
+            await self.store(self.incident, self._metadata())
             self.persisted, self.persistence_error = True, None
         except Exception as exc:  # keep the incident in memory and report
             self.persisted, self.persistence_error = False, f"{type(exc).__name__}: {exc}"
 
-        await self.emit({"type": "incident_state", "state": self.state.model_dump()})
+        await self._emit_state(asking=None)
         await self.emit(
             {
                 "type": "incident_complete",
-                "incident": incident.model_dump(mode="json"),
+                "incident": self.incident.model_dump(mode="json"),
                 "persisted": self.persisted,
                 "persistence_error": self.persistence_error,
             }
         )
 
     # --- helpers ------------------------------------------------------------------
+
+    async def _emit_state(self, asking: Topic | None) -> None:
+        """Live update for the debug panel: working state, checklist and draft Incident JSON."""
+        await self.emit(
+            {
+                "type": "incident_state",
+                "state": self.state.model_dump(mode="json"),
+                "topics": topic_overview(self.state, asking),
+                "next_topic": asking,
+                "incident": self.incident.model_dump(mode="json") if self.incident else incident_payload(self.state),
+            }
+        )
+
+    @staticmethod
+    def _question(turn: GeminiTurn, topic: Topic) -> str:
+        question = turn.question_for(topic) or FALLBACK_QUESTIONS[topic]
+        preface = (turn.preface or "").strip()
+        return f"{preface} {question}" if preface else question
 
     async def _call_llm(self, prompt: str) -> GeminiTurn:
         try:
@@ -293,8 +289,8 @@ class IntakeAgent:
     async def _say(self, text: str) -> None:
         self.transcript.append(TranscriptEntry(speaker="agent", text=text))
 
-    def _state_dict(self) -> dict:
-        return self.state.model_dump(exclude={"session_id", "status"})
+    def _caller_turns(self) -> int:
+        return sum(1 for t in self.transcript if t.speaker == "user")
 
     def _transcript_dicts(self) -> list[dict]:
         return [t.model_dump(include={"speaker", "text"}) for t in self.transcript]
@@ -303,6 +299,7 @@ class IntakeAgent:
         return {
             "session_id": self.state.session_id,
             "transcript": [t.model_dump(mode="json") for t in self.transcript],
+            "working_state": self.state.model_dump(mode="json"),
             "classification_runs": self.classification_runs,
             "jev_raw": self.jev_raw,
             "clarifications_used": self.clarifications_used,

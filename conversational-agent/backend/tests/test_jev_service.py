@@ -1,7 +1,9 @@
 from models.classification import CLASSIFICATION_FIELDS
 from models.conversation import TranscriptEntry
-from models.incident import IncidentState, PatientState
+from intake_policy import merge_turn
+from models.working_state import WorkingState
 from services.jev_service import QUESTIONS, build_jev_state, build_request, normalize_response
+from tests.fakes import turn
 
 # Shape taken from https://docs.typesafe.ai/api (Choice answers).
 RAW_RESPONSE = {
@@ -81,13 +83,19 @@ def test_questions_use_our_label_sets():
 
 
 def test_jev_state_contains_only_classification_inputs():
-    state = IncidentState(
-        session_id="secret-session",
-        location="University of Twente",
-        incident_description="Father collapsed.",
-        conversation_summary="Caller's father collapsed and is not responding.",
-        patient=PatientState(consciousness="unconscious"),
-        number_of_patients=1,
+    state = merge_turn(
+        WorkingState(session_id="secret-session"),
+        turn(
+            location="University of Twente",
+            incident_description="Father collapsed.",
+            mechanism=None,
+            patient_count=1,
+            consciousness="unconscious",
+            severe_bleeding="not_relevant",
+            symptoms=["gasping"],
+            conversation_summary="Caller's father collapsed and is not responding. He is gasping.",
+        ),
+        1,
     )
     transcript = [
         TranscriptEntry(speaker="agent", text="Is he breathing?"),
@@ -95,10 +103,16 @@ def test_jev_state_contains_only_classification_inputs():
     ]
     jev_state = build_jev_state(state, transcript)
     assert set(jev_state) == {
-        "incident_description", "conversation_summary", "patient", "number_of_patients", "call_transcript",
+        "incident_description", "mechanism", "patient_state", "symptoms", "number_of_patients",
+        "scene", "conversation_summary", "call_transcript",
     }
+    assert jev_state["patient_state"] == {
+        "consciousness": "unconscious", "breathing": "unknown", "severe_bleeding": "not_relevant",
+    }
+    assert jev_state["mechanism"] == "unknown" and jev_state["symptoms"] == ["gasping"]
+    assert jev_state["scene"] == {"entrapment": "not_relevant", "immediate_danger": "not_relevant"}
     assert "University of Twente" not in str(jev_state)
-    assert "secret-session" not in str(jev_state)
+    assert "secret-session" not in str(jev_state) and "source_turn" not in str(jev_state)
     assert jev_state["call_transcript"][1] == "Caller: He's making strange noises."
 
     request = build_request(jev_state, "jev-latest")

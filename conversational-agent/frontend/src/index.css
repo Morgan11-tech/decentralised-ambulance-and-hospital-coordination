@@ -470,6 +470,10 @@ button {
   font-size: 11px;
 }
 
+.debug__persist--draft {
+  color: var(--ink-dim);
+}
+
 .debug__persist--fail {
   color: #f2c14e;
 }
@@ -597,6 +601,92 @@ button {
   cursor: pointer;
 }
 
+/* live JSON: changed lines light up */
+
+.json__line {
+  display: block;
+  margin: 0 -14px;
+  padding: 0 14px;
+}
+
+.json__line--changed {
+  animation: line-flash 2.6s ease-out;
+}
+
+@keyframes line-flash {
+  0%, 25% {
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
+    color: var(--ink);
+  }
+  100% {
+    background: transparent;
+  }
+}
+
+/* information checklist */
+
+.topics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.topic {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 10.5px;
+  transition: border-color 400ms, background 400ms;
+}
+
+.topic span {
+  color: var(--ink-faint);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.topic em {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 11.5px;
+  font-style: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.topic--known {
+  border-color: color-mix(in oklab, #7fd65c 35%, transparent);
+}
+
+.topic--next {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+.topic--next em {
+  color: var(--accent);
+}
+
+.topic--missing em,
+.topic--unanswered em {
+  color: #f2c14e;
+}
+
+.topic--not_relevant {
+  opacity: 0.45;
+}
+
+.topic--not_relevant em {
+  color: var(--ink-faint);
+}
+
 /* classification */
 
 .classification__meta {
@@ -683,6 +773,7 @@ button {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .json__line--changed,
   .app::after,
   .voice-orb[data-status="thinking"],
   .voice-orb__dot {

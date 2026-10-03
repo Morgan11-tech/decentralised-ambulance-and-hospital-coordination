@@ -1,72 +1,43 @@
 {
   "$defs": {
-    "ClassificationSummary": {
+    "Classification": {
       "additionalProperties": false,
-      "description": "Classifier output that downstream agents may want to reason about.\n\nConfidences are 0..1, or null when no classifier confidence exists\n(e.g. Jev was unavailable, or the incident was generated synthetically).",
       "properties": {
-        "incident_type_confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Incident Type Confidence"
+        "incident_type": {
+          "$ref": "#/$defs/IncidentTypeLabel"
         },
-        "severity_confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Severity Confidence"
+        "severity": {
+          "$ref": "#/$defs/SeverityLabel"
         },
         "consciousness_concern": {
-          "default": "uncertain",
-          "enum": [
-            "yes",
-            "no",
-            "uncertain"
-          ],
-          "title": "Consciousness Concern",
-          "type": "string"
-        },
-        "consciousness_concern_confidence": {
-          "anyOf": [
-            {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Consciousness Concern Confidence"
+          "$ref": "#/$defs/ConcernLabel"
         },
         "breathing_concern": {
-          "default": "uncertain",
+          "$ref": "#/$defs/ConcernLabel"
+        }
+      },
+      "required": [
+        "incident_type",
+        "severity",
+        "consciousness_concern",
+        "breathing_concern"
+      ],
+      "title": "Classification",
+      "type": "object"
+    },
+    "ConcernLabel": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
           "enum": [
             "yes",
             "no",
             "uncertain"
           ],
-          "title": "Breathing Concern",
+          "title": "Value",
           "type": "string"
         },
-        "breathing_concern_confidence": {
+        "confidence": {
           "anyOf": [
             {
               "maximum": 1,
@@ -78,18 +49,109 @@
             }
           ],
           "default": null,
-          "title": "Breathing Concern Confidence"
+          "description": "Classifier confidence 0..1; null when no confidence exists (classifier unavailable, or synthetic data).",
+          "title": "Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "confidence"
+      ],
+      "title": "ConcernLabel",
+      "type": "object"
+    },
+    "IncidentDetails": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "One short factual sentence about what happened.",
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
         },
-        "classifier": {
-          "description": "What produced the labels, e.g. \"jev-1.13.0\", \"unavailable\" or \"synthetic\".",
-          "title": "Classifier",
+        "mechanism": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "How it happened, e.g. 'bicycle fall'; null if not applicable/known.",
+          "title": "Mechanism"
+        },
+        "type": {
+          "enum": [
+            "cardiac_or_circulatory",
+            "respiratory",
+            "trauma",
+            "neurological",
+            "bleeding",
+            "other",
+            "uncertain"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "critical",
+            "urgent",
+            "non_urgent",
+            "uncertain"
+          ],
+          "title": "Severity",
           "type": "string"
         }
       },
       "required": [
-        "classifier"
+        "description",
+        "mechanism",
+        "type",
+        "severity"
       ],
-      "title": "ClassificationSummary",
+      "title": "IncidentDetails",
+      "type": "object"
+    },
+    "IncidentTypeLabel": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "enum": [
+            "cardiac_or_circulatory",
+            "respiratory",
+            "trauma",
+            "neurological",
+            "bleeding",
+            "other",
+            "uncertain"
+          ],
+          "title": "Value",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Classifier confidence 0..1; null when no confidence exists (classifier unavailable, or synthetic data).",
+          "title": "Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "confidence"
+      ],
+      "title": "IncidentTypeLabel",
       "type": "object"
     },
     "Location": {
@@ -105,6 +167,7 @@
             }
           ],
           "default": null,
+          "description": "Location as described, e.g. 'Vrijhof, University of Twente'.",
           "title": "Raw Text"
         },
         "latitude": {
@@ -136,17 +199,21 @@
           "title": "Longitude"
         }
       },
+      "required": [
+        "raw_text",
+        "latitude",
+        "longitude"
+      ],
       "title": "Location",
       "type": "object"
     },
-    "PatientState": {
+    "PatientCondition": {
       "additionalProperties": false,
       "properties": {
         "consciousness": {
           "default": "unknown",
           "enum": [
             "conscious",
-            "altered",
             "unconscious",
             "unknown"
           ],
@@ -164,19 +231,131 @@
           "title": "Breathing",
           "type": "string"
         },
-        "bleeding": {
+        "severe_bleeding": {
           "default": "unknown",
+          "description": "present = heavy or uncontrolled bleeding reported.",
           "enum": [
-            "none",
             "present",
-            "severe",
+            "absent",
             "unknown"
           ],
-          "title": "Bleeding",
+          "title": "Severe Bleeding",
+          "type": "string"
+        },
+        "symptoms": {
+          "description": "Observations in plain words, e.g. 'head injury', 'left arm weakness'. Never diagnoses.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Symptoms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "consciousness",
+        "breathing",
+        "severe_bleeding",
+        "symptoms"
+      ],
+      "title": "PatientCondition",
+      "type": "object"
+    },
+    "Patients": {
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Number of patients; null if unknown.",
+          "title": "Count"
+        },
+        "primary_patient": {
+          "$ref": "#/$defs/PatientCondition",
+          "description": "The patient described, or the most seriously affected one when there are several."
+        }
+      },
+      "required": [
+        "count",
+        "primary_patient"
+      ],
+      "title": "Patients",
+      "type": "object"
+    },
+    "Scene": {
+      "additionalProperties": false,
+      "properties": {
+        "entrapment": {
+          "default": "unknown",
+          "enum": [
+            "yes",
+            "no",
+            "unknown",
+            "not_relevant"
+          ],
+          "title": "Entrapment",
+          "type": "string"
+        },
+        "immediate_danger": {
+          "default": "unknown",
+          "enum": [
+            "yes",
+            "no",
+            "unknown",
+            "not_relevant"
+          ],
+          "title": "Immediate Danger",
           "type": "string"
         }
       },
-      "title": "PatientState",
+      "required": [
+        "entrapment",
+        "immediate_danger"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "SeverityLabel": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "enum": [
+            "critical",
+            "urgent",
+            "non_urgent",
+            "uncertain"
+          ],
+          "title": "Value",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Classifier confidence 0..1; null when no confidence exists (classifier unavailable, or synthetic data).",
+          "title": "Confidence"
+        }
+      },
+      "required": [
+        "value",
+        "confidence"
+      ],
+      "title": "SeverityLabel",
       "type": "object"
     }
   },
@@ -190,6 +369,7 @@
       "type": "string"
     },
     "incident_id": {
+      "minLength": 1,
       "title": "Incident Id",
       "type": "string"
     },
@@ -203,62 +383,13 @@
         }
       ],
       "default": null,
+      "description": "Voice session id; null for synthetic incidents.",
       "title": "Session Id"
     },
     "created_at": {
       "format": "date-time",
       "title": "Created At",
       "type": "string"
-    },
-    "location": {
-      "$ref": "#/$defs/Location"
-    },
-    "incident_description": {
-      "minLength": 1,
-      "title": "Incident Description",
-      "type": "string"
-    },
-    "incident_type": {
-      "enum": [
-        "cardiac_or_circulatory",
-        "respiratory",
-        "trauma",
-        "neurological",
-        "bleeding",
-        "other",
-        "uncertain"
-      ],
-      "title": "Incident Type",
-      "type": "string"
-    },
-    "severity": {
-      "enum": [
-        "critical",
-        "urgent",
-        "non_urgent",
-        "uncertain"
-      ],
-      "title": "Severity",
-      "type": "string"
-    },
-    "patient": {
-      "$ref": "#/$defs/PatientState"
-    },
-    "number_of_patients": {
-      "anyOf": [
-        {
-          "minimum": 1,
-          "type": "integer"
-        },
-        {
-          "type": "null"
-        }
-      ],
-      "default": null,
-      "title": "Number Of Patients"
-    },
-    "classification": {
-      "$ref": "#/$defs/ClassificationSummary"
     },
     "source": {
       "enum": [
@@ -268,6 +399,21 @@
       "title": "Source",
       "type": "string"
     },
+    "location": {
+      "$ref": "#/$defs/Location"
+    },
+    "incident": {
+      "$ref": "#/$defs/IncidentDetails"
+    },
+    "patients": {
+      "$ref": "#/$defs/Patients"
+    },
+    "scene": {
+      "$ref": "#/$defs/Scene"
+    },
+    "classification": {
+      "$ref": "#/$defs/Classification"
+    },
     "status": {
       "const": "ready_for_dispatch",
       "default": "ready_for_dispatch",
@@ -276,13 +422,17 @@
     }
   },
   "required": [
+    "schema_version",
+    "incident_id",
+    "session_id",
+    "created_at",
+    "source",
     "location",
-    "incident_description",
-    "incident_type",
-    "severity",
-    "patient",
+    "incident",
+    "patients",
+    "scene",
     "classification",
-    "source"
+    "status"
   ],
   "title": "Incident",
   "type": "object"

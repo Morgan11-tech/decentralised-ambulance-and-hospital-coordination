@@ -16,7 +16,7 @@ SCHEMA_PATH = PROJECT_ROOT / "schemas" / "incident.schema.json"
 
 
 def incident_schema_json() -> str:
-    return json.dumps(Incident.model_json_schema(), indent=2) + "\n"
+    return json.dumps(Incident.model_json_schema(mode="serialization"), indent=2) + "\n"
 
 
 if __name__ == "__main__":

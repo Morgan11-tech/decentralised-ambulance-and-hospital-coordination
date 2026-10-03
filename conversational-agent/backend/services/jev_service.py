@@ -1,16 +1,3 @@
-"""Jev (TypeSafe System One) adapter.
-
-Jev is NOT the conversational model. It receives a clean incident state and
-answers four bounded Choice questions. Every Choice answer comes back with a
-chosen option, a probability per option and a `confidence` (0..1).
-
-All Jev-specific request building and response parsing lives in this file.
-The rest of the app only sees our own `ClassificationResult`.
-
-API: POST {JEV_API_URL}  (default https://api.typesafe.ai/v1/systemone)
-Docs: https://docs.typesafe.ai/api
-"""
-
 import asyncio
 
 import httpx
@@ -18,7 +5,7 @@ import httpx
 from config import get_settings
 from models.classification import CLASSIFICATION_FIELDS, ClassificationResult, LabelResult
 from models.conversation import TranscriptEntry
-from models.incident import IncidentState
+from models.working_state import Fact, WorkingState
 
 _UNCERTAIN = "The information provided is not enough to decide."
 
@@ -77,13 +64,27 @@ QUESTIONS = {
 }
 
 
-def build_jev_state(state: IncidentState, transcript: list[TranscriptEntry]) -> dict:
-    """Only the information relevant to classification (no location, ids, etc.)."""
+def _show(fact: Fact):
+    return fact.value if fact.status == "known" else fact.status  # "unknown" / "not_relevant"
+
+
+def build_jev_state(state: WorkingState, transcript: list[TranscriptEntry]) -> dict:
+    """The structured factual state relevant to classification (no location, ids, bookkeeping)."""
     return {
-        "incident_description": state.incident_description,
+        "incident_description": _show(state.incident.description),
+        "mechanism": _show(state.incident.mechanism),
+        "patient_state": {
+            "consciousness": _show(state.patient_state.consciousness),
+            "breathing": _show(state.patient_state.breathing),
+            "severe_bleeding": _show(state.patient_state.severe_bleeding),
+        },
+        "symptoms": state.patient_state.symptoms,
+        "number_of_patients": _show(state.patients.count),
+        "scene": {
+            "entrapment": _show(state.scene.entrapment),
+            "immediate_danger": _show(state.scene.immediate_danger),
+        },
         "conversation_summary": state.conversation_summary,
-        "patient": state.patient.model_dump(),
-        "number_of_patients": state.number_of_patients,
         "call_transcript": [
             f"{'Caller' if t.speaker == 'user' else 'Call-taker'}: {t.text}" for t in transcript
         ],
@@ -121,7 +122,7 @@ def normalize_response(raw: dict) -> ClassificationResult:
 
 
 async def classify(
-    state: IncidentState, transcript: list[TranscriptEntry]
+    state: WorkingState, transcript: list[TranscriptEntry]
 ) -> tuple[ClassificationResult, dict | None]:
     """Run the four classifications. Never raises: on failure every label is
     "uncertain" and `result.error` explains why. Returns (result, raw_response)."""

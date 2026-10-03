@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "incident_id": "INC-7C41A2E9B05D",
+  "session_id": "3f2b8c1e-9d4a-4e7b-a6c2-81d5f0e93a47",
+  "created_at": "2026-10-03T14:22:37.418Z",
+  "source": "voice_agent",
+  "location": {
+    "raw_text": "Outside the Vrijhof, University of Twente",
+    "latitude": null,
+    "longitude": null
+  },
+  "incident": {
+    "description": "Friend fell off his bicycle and hit his head.",
+    "mechanism": "bicycle fall",
+    "type": "trauma",
+    "severity": "urgent"
+  },
+  "patients": {
+    "count": 1,
+    "primary_patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "severe_bleeding": "absent",
+      "symptoms": [
+        "head injury",
+        "bleeding from the head"
+      ]
+    }
+  },
+  "scene": {
+    "entrapment": "not_relevant",
+    "immediate_danger": "not_relevant"
+  },
+  "classification": {
+    "incident_type": {
+      "value": "trauma",
+      "confidence": null
+    },
+    "severity": {
+      "value": "urgent",
+      "confidence": null
+    },
+    "consciousness_concern": {
+      "value": "no",
+      "confidence": null
+    },
+    "breathing_concern": {
+      "value": "no",
+      "confidence": null
+    }
+  },
+  "status": "ready_for_dispatch"
+}
