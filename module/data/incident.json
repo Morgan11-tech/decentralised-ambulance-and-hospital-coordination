@@ -1,0 +1,452 @@
+[
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-000",
+    "session_id": "sess-000",
+    "created_at": "2026-02-01T08:04:30.116156Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.33757,
+      "longitude": 6.65127
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-001",
+    "session_id": "sess-001",
+    "created_at": "2026-02-01T08:04:46.588473Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.13861,
+      "longitude": 6.59945
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-002",
+    "session_id": "sess-002",
+    "created_at": "2026-02-01T08:05:21.809970Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.38223,
+      "longitude": 6.73859
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-003",
+    "session_id": "sess-003",
+    "created_at": "2026-02-01T08:15:38.939392Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.3327,
+      "longitude": 6.89433
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-004",
+    "session_id": "sess-004",
+    "created_at": "2026-02-01T08:35:47.446627Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.3406,
+      "longitude": 6.61123
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-005",
+    "session_id": "sess-005",
+    "created_at": "2026-02-01T08:39:21.290128Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.22887,
+      "longitude": 6.91647
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-006",
+    "session_id": "sess-006",
+    "created_at": "2026-02-01T08:39:40.758718Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.28123,
+      "longitude": 6.76965
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-007",
+    "session_id": "sess-007",
+    "created_at": "2026-02-01T08:40:10.675972Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.28829,
+      "longitude": 6.89788
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-008",
+    "session_id": "sess-008",
+    "created_at": "2026-02-01T08:49:30.316638Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.26764,
+      "longitude": 6.81233
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-009",
+    "session_id": "sess-009",
+    "created_at": "2026-02-01T09:15:56.755653Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.23254,
+      "longitude": 6.82804
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-010",
+    "session_id": "sess-010",
+    "created_at": "2026-02-01T09:30:57.837112Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.23638,
+      "longitude": 6.89018
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-011",
+    "session_id": "sess-011",
+    "created_at": "2026-02-01T09:38:05.367991Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.3305,
+      "longitude": 6.58803
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-012",
+    "session_id": "sess-012",
+    "created_at": "2026-02-01T09:46:04.069386Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.19731,
+      "longitude": 6.66313
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-013",
+    "session_id": "sess-013",
+    "created_at": "2026-02-01T09:55:05.809423Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.19666,
+      "longitude": 6.8253
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-014",
+    "session_id": "sess-014",
+    "created_at": "2026-02-01T09:56:58.751928Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.31241,
+      "longitude": 6.91198
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-015",
+    "session_id": "sess-015",
+    "created_at": "2026-02-01T10:01:48.354464Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.24227,
+      "longitude": 6.80306
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-016",
+    "session_id": "sess-016",
+    "created_at": "2026-02-01T10:12:33.889113Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.30211,
+      "longitude": 6.83176
+    },
+    "incident_description": "synthetic A1 incident",
+    "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "none"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-017",
+    "session_id": "sess-017",
+    "created_at": "2026-02-01T10:40:35.539331Z",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.23963,
+      "longitude": 6.77402
+    },
+    "incident_description": "synthetic A2 incident",
+    "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {
+      "consciousness": "conscious",
+      "breathing": "normal",
+      "bleeding": "present"
+    },
+    "number_of_patients": 1,
+    "classification": {
+      "classifier": "synthetic"
+    },
+    "source": "synthetic_generator",
+    "status": "ready_for_dispatch"
+  }
+]

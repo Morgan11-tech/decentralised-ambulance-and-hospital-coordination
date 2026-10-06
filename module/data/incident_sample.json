@@ -1,0 +1,46 @@
+[
+  {
+    "schema_version": "1.0", "incident_id": "inc-001", "session_id": "sess-a1",
+    "created_at": "2026-02-01T08:00:00Z",
+    "location": {"raw_text": "Enschede centrum", "latitude": 52.221, "longitude": 6.893},
+    "incident_description": "Collapsed, not breathing", "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {"consciousness": "unconscious", "breathing": "not_breathing", "bleeding": "none"},
+    "number_of_patients": 1,
+    "classification": {"classifier": "synthetic", "consciousness_concern": "yes", "breathing_concern": "yes"},
+    "source": "synthetic_generator"
+  },
+  {
+    "schema_version": "1.0", "incident_id": "inc-002", "session_id": "sess-a2",
+    "created_at": "2026-02-01T08:04:00Z",
+    "location": {"raw_text": "Hengelo", "latitude": 52.265, "longitude": 6.793},
+    "incident_description": "Chest pain, conscious", "incident_type": "cardiac_or_circulatory",
+    "severity": "critical",
+    "patient": {"consciousness": "conscious", "breathing": "normal", "bleeding": "none"},
+    "number_of_patients": 1,
+    "classification": {"classifier": "synthetic", "consciousness_concern": "no", "breathing_concern": "no"},
+    "source": "synthetic_generator"
+  },
+  {
+    "schema_version": "1.0", "incident_id": "inc-003", "session_id": "sess-a3",
+    "created_at": "2026-02-01T08:10:00Z",
+    "location": {"raw_text": "Almelo", "latitude": 52.357, "longitude": 6.662},
+    "incident_description": "Fall, painful ankle", "incident_type": "trauma",
+    "severity": "urgent",
+    "patient": {"consciousness": "conscious", "breathing": "normal", "bleeding": "present"},
+    "number_of_patients": 1,
+    "classification": {"classifier": "synthetic"},
+    "source": "synthetic_generator"
+  },
+  {
+    "schema_version": "1.0", "incident_id": "inc-004", "session_id": "sess-a4",
+    "created_at": "2026-02-01T08:15:00Z",
+    "location": {"raw_text": "Oldenzaal", "latitude": 52.313, "longitude": 6.928},
+    "incident_description": "Routine check transport", "incident_type": "other",
+    "severity": "non_urgent",
+    "patient": {"consciousness": "conscious", "breathing": "normal", "bleeding": "none"},
+    "number_of_patients": 1,
+    "classification": {"classifier": "synthetic"},
+    "source": "synthetic_generator"
+  }
+]
