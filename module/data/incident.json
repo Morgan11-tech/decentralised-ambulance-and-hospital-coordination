@@ -2,451 +2,952 @@
   {
     "schema_version": "1.0",
     "incident_id": "gen-000",
-    "session_id": "sess-000",
+    "session_id": null,
     "created_at": "2026-02-01T08:04:30.116156Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.33757,
-      "longitude": 6.65127
+      "latitude": 52.2511,
+      "longitude": 6.50728
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Person fell off a bicycle and hit their head.",
+      "mechanism": "bicycle fall",
+      "type": "trauma",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "head injury",
+          "bleeding from the head"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-001",
-    "session_id": "sess-001",
+    "session_id": null,
     "created_at": "2026-02-01T08:04:46.588473Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
       "latitude": 52.13861,
       "longitude": 6.59945
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "shortness of breath",
+          "wheezing"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "respiratory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-002",
-    "session_id": "sess-002",
+    "session_id": null,
     "created_at": "2026-02-01T08:05:21.809970Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.38223,
-      "longitude": 6.73859
+      "latitude": 52.32935,
+      "longitude": 6.65621
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person suddenly collapsed and does not respond.",
+      "mechanism": null,
+      "type": "neurological",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "unconscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "face drooping",
+          "unresponsive"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "neurological",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "yes",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-003",
-    "session_id": "sess-003",
+    "session_id": null,
     "created_at": "2026-02-01T08:15:38.939392Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.3327,
-      "longitude": 6.89433
+      "latitude": 52.18716,
+      "longitude": 6.84013
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Deep cut on the hand that keeps bleeding.",
+      "mechanism": "kitchen knife",
+      "type": "bleeding",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "bleeding hand wound"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "bleeding",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-004",
-    "session_id": "sess-004",
+    "session_id": null,
     "created_at": "2026-02-01T08:35:47.446627Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.3406,
-      "longitude": 6.61123
+      "latitude": 52.23941,
+      "longitude": 6.89721
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "shortness of breath",
+          "wheezing"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "respiratory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-005",
-    "session_id": "sess-005",
+    "session_id": null,
     "created_at": "2026-02-01T08:39:21.290128Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.22887,
-      "longitude": 6.91647
+      "latitude": 52.2616,
+      "longitude": 6.62212
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "shortness of breath",
+          "wheezing"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "respiratory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-006",
-    "session_id": "sess-006",
+    "session_id": null,
     "created_at": "2026-02-01T08:39:40.758718Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.28123,
-      "longitude": 6.76965
+      "latitude": 52.27352,
+      "longitude": 6.8838
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person fell down the stairs and hurt their hip.",
+      "mechanism": "fall",
+      "type": "trauma",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "hip pain",
+          "cannot stand"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-007",
-    "session_id": "sess-007",
+    "session_id": null,
     "created_at": "2026-02-01T08:40:10.675972Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.28829,
-      "longitude": 6.89788
+      "latitude": 52.22519,
+      "longitude": 6.86465
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person fell down the stairs and hurt their hip.",
+      "mechanism": "fall",
+      "type": "trauma",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "hip pain",
+          "cannot stand"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-008",
-    "session_id": "sess-008",
+    "session_id": null,
     "created_at": "2026-02-01T08:49:30.316638Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.26764,
-      "longitude": 6.81233
+      "latitude": 52.341,
+      "longitude": 6.66631
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person fell down the stairs and hurt their hip.",
+      "mechanism": "fall",
+      "type": "trauma",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "hip pain",
+          "cannot stand"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-009",
-    "session_id": "sess-009",
+    "session_id": null,
     "created_at": "2026-02-01T09:15:56.755653Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.23254,
-      "longitude": 6.82804
+      "latitude": 52.2059,
+      "longitude": 6.93367
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Person suddenly collapsed and does not respond.",
+      "mechanism": null,
+      "type": "neurological",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "unconscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "face drooping",
+          "unresponsive"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "neurological",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "yes",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-010",
-    "session_id": "sess-010",
+    "session_id": null,
     "created_at": "2026-02-01T09:30:57.837112Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.23638,
-      "longitude": 6.89018
+      "latitude": 52.20826,
+      "longitude": 6.92801
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person fell down the stairs and hurt their hip.",
+      "mechanism": "fall",
+      "type": "trauma",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "hip pain",
+          "cannot stand"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-011",
-    "session_id": "sess-011",
+    "session_id": null,
     "created_at": "2026-02-01T09:38:05.367991Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.3305,
-      "longitude": 6.58803
+      "latitude": 52.24122,
+      "longitude": 6.79227
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "shortness of breath",
+          "wheezing"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "respiratory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-012",
-    "session_id": "sess-012",
+    "session_id": null,
     "created_at": "2026-02-01T09:46:04.069386Z",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.19731,
-      "longitude": 6.66313
-    },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
-    },
-    "number_of_patients": 1,
-    "classification": {
-      "classifier": "synthetic"
-    },
     "source": "synthetic_generator",
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-013",
-    "session_id": "sess-013",
-    "created_at": "2026-02-01T09:55:05.809423Z",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.19666,
-      "longitude": 6.8253
-    },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
-    },
-    "number_of_patients": 1,
-    "classification": {
-      "classifier": "synthetic"
-    },
-    "source": "synthetic_generator",
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-014",
-    "session_id": "sess-014",
-    "created_at": "2026-02-01T09:56:58.751928Z",
     "location": {
       "raw_text": null,
       "latitude": 52.31241,
       "longitude": 6.91198
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person suddenly collapsed and does not respond.",
+      "mechanism": null,
+      "type": "neurological",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "unconscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "face drooping",
+          "unresponsive"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "neurological",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "yes",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-013",
+    "session_id": null,
+    "created_at": "2026-02-01T09:55:05.809423Z",
     "source": "synthetic_generator",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.19356,
+      "longitude": 6.87205
+    },
+    "incident": {
+      "description": "Person with chest pain is struggling to breathe.",
+      "mechanism": null,
+      "type": "cardiac_or_circulatory",
+      "severity": "critical"
+    },
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "chest pain",
+          "pale and sweating"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
+    "classification": {
+      "incident_type": {
+        "value": "cardiac_or_circulatory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
+    },
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-014",
+    "session_id": null,
+    "created_at": "2026-02-01T09:56:58.751928Z",
+    "source": "synthetic_generator",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.31038,
+      "longitude": 6.93158
+    },
+    "incident": {
+      "description": "Cyclist hit by a car, heavy bleeding from the leg.",
+      "mechanism": "car collision",
+      "type": "trauma",
+      "severity": "critical"
+    },
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "present",
+        "symptoms": [
+          "leg injury"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "unknown"
+    },
+    "classification": {
+      "incident_type": {
+        "value": "trauma",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
+    },
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-015",
-    "session_id": "sess-015",
+    "session_id": null,
     "created_at": "2026-02-01T10:01:48.354464Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.24227,
-      "longitude": 6.80306
+      "latitude": 52.20707,
+      "longitude": 6.60131
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person has chest pain but is breathing normally.",
+      "mechanism": null,
+      "type": "cardiac_or_circulatory",
+      "severity": "urgent"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "normal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "chest pain"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "cardiac_or_circulatory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "urgent",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "no",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-016",
-    "session_id": "sess-016",
+    "session_id": null,
     "created_at": "2026-02-01T10:12:33.889113Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.30211,
-      "longitude": 6.83176
+      "latitude": 52.1968,
+      "longitude": 6.88033
     },
-    "incident_description": "synthetic A1 incident",
-    "incident_type": "cardiac_or_circulatory",
-    "severity": "critical",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "none"
+    "incident": {
+      "description": "Person with chest pain is struggling to breathe.",
+      "mechanism": null,
+      "type": "cardiac_or_circulatory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "chest pain",
+          "pale and sweating"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "cardiac_or_circulatory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   },
   {
     "schema_version": "1.0",
     "incident_id": "gen-017",
-    "session_id": "sess-017",
+    "session_id": null,
     "created_at": "2026-02-01T10:40:35.539331Z",
+    "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.23963,
-      "longitude": 6.77402
+      "latitude": 52.19042,
+      "longitude": 6.84318
     },
-    "incident_description": "synthetic A2 incident",
-    "incident_type": "trauma",
-    "severity": "urgent",
-    "patient": {
-      "consciousness": "conscious",
-      "breathing": "normal",
-      "bleeding": "present"
+    "incident": {
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
-    "number_of_patients": 1,
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "shortness of breath",
+          "wheezing"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
     "classification": {
-      "classifier": "synthetic"
+      "incident_type": {
+        "value": "respiratory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
     },
-    "source": "synthetic_generator",
     "status": "ready_for_dispatch"
   }
 ]

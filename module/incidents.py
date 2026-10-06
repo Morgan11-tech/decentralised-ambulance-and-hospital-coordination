@@ -1,5 +1,9 @@
 """
-incidents.py — Load incident.json (the teammate's schema) into simulation incidents.
+incidents.py — Load incident.json into simulation incidents.
+
+Records follow the canonical contract (schema 1.0):
+conversational-agent/schemas/incident.schema.json, documented in
+conversational-agent/docs/incident-schema.md.
 
 Does three jobs:
   1. Maps the schema's coarse severity to the operational Dutch codes A0/A1/A2/B,
@@ -91,8 +95,10 @@ def load_incidents(path: str, seed: int = config.SEED, include_planned: bool = F
         if not (0 <= x <= config.SPACE_WIDTH_KM and 0 <= y <= config.SPACE_HEIGHT_KM):
             print(f"[warn] incident {r.get('incident_id', i)} at ({x:.1f},{y:.1f}) km is outside the map")
 
-        breathing = (r.get("patient") or {}).get("breathing", "unknown")
-        code = to_operational_code(r["severity"], breathing)
+        details = r["incident"]
+        patients = r["patients"]
+        breathing = patients["primary_patient"]["breathing"]
+        code = to_operational_code(details["severity"], breathing)
         if code == "B" and not include_planned:
             continue
 
@@ -117,12 +123,12 @@ def load_incidents(path: str, seed: int = config.SEED, include_planned: bool = F
             created_tick=tick,
             pos=(x, y),
             code=code,
-            incident_type=r.get("incident_type", "uncertain"),
+            incident_type=details["type"],
             on_scene_min=round(on_scene, 1),
             transport_needed=transport,
             immediate_dispatch=immediate,
             los_min=round(los, 1),
-            n_patients=r.get("number_of_patients") or 1,
+            n_patients=patients["count"] or 1,   # null = unknown -> 1
         ))
 
     incidents.sort(key=lambda inc: inc.created_tick)
