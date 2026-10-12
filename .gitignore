@@ -15,3 +15,5 @@ ENV/
 
 # OS / editor noise
 .DS_Store
+
+EXPLANATIONS.md
