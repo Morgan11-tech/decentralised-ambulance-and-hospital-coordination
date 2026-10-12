@@ -7,24 +7,24 @@
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
-      "latitude": 52.2511,
-      "longitude": 6.50728
+      "latitude": 52.27689,
+      "longitude": 6.75787
     },
     "incident": {
-      "description": "Person fell off a bicycle and hit their head.",
-      "mechanism": "bicycle fall",
-      "type": "trauma",
-      "severity": "urgent"
+      "description": "Severe asthma attack, person is gasping for air.",
+      "mechanism": null,
+      "type": "respiratory",
+      "severity": "critical"
     },
     "patients": {
       "count": 1,
       "primary_patient": {
         "consciousness": "conscious",
-        "breathing": "normal",
+        "breathing": "abnormal",
         "severe_bleeding": "absent",
         "symptoms": [
-          "head injury",
-          "bleeding from the head"
+          "shortness of breath",
+          "wheezing"
         ]
       }
     },
@@ -34,11 +34,11 @@
     },
     "classification": {
       "incident_type": {
-        "value": "trauma",
+        "value": "respiratory",
         "confidence": null
       },
       "severity": {
-        "value": "urgent",
+        "value": "critical",
         "confidence": null
       },
       "consciousness_concern": {
@@ -46,7 +46,7 @@
         "confidence": null
       },
       "breathing_concern": {
-        "value": "no",
+        "value": "yes",
         "confidence": null
       }
     },
@@ -56,7 +56,60 @@
     "schema_version": "1.0",
     "incident_id": "gen-001",
     "session_id": null,
-    "created_at": "2026-02-01T08:04:46.588473Z",
+    "created_at": "2026-02-01T08:05:21.809970Z",
+    "source": "synthetic_generator",
+    "location": {
+      "raw_text": null,
+      "latitude": 52.2511,
+      "longitude": 6.50728
+    },
+    "incident": {
+      "description": "Person with chest pain is struggling to breathe.",
+      "mechanism": null,
+      "type": "cardiac_or_circulatory",
+      "severity": "critical"
+    },
+    "patients": {
+      "count": 1,
+      "primary_patient": {
+        "consciousness": "conscious",
+        "breathing": "abnormal",
+        "severe_bleeding": "absent",
+        "symptoms": [
+          "chest pain",
+          "pale and sweating"
+        ]
+      }
+    },
+    "scene": {
+      "entrapment": "not_relevant",
+      "immediate_danger": "not_relevant"
+    },
+    "classification": {
+      "incident_type": {
+        "value": "cardiac_or_circulatory",
+        "confidence": null
+      },
+      "severity": {
+        "value": "critical",
+        "confidence": null
+      },
+      "consciousness_concern": {
+        "value": "no",
+        "confidence": null
+      },
+      "breathing_concern": {
+        "value": "yes",
+        "confidence": null
+      }
+    },
+    "status": "ready_for_dispatch"
+  },
+  {
+    "schema_version": "1.0",
+    "incident_id": "gen-002",
+    "session_id": null,
+    "created_at": "2026-02-01T08:15:38.939392Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -107,9 +160,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-002",
+    "incident_id": "gen-003",
     "session_id": null,
-    "created_at": "2026-02-01T08:05:21.809970Z",
+    "created_at": "2026-02-01T08:39:21.290128Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -160,9 +213,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-003",
+    "incident_id": "gen-004",
     "session_id": null,
-    "created_at": "2026-02-01T08:15:38.939392Z",
+    "created_at": "2026-02-01T08:40:10.675972Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -212,9 +265,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-004",
+    "incident_id": "gen-005",
     "session_id": null,
-    "created_at": "2026-02-01T08:35:47.446627Z",
+    "created_at": "2026-02-01T08:49:30.316638Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -265,9 +318,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-005",
+    "incident_id": "gen-006",
     "session_id": null,
-    "created_at": "2026-02-01T08:39:21.290128Z",
+    "created_at": "2026-02-01T09:15:56.755653Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -318,9 +371,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-006",
+    "incident_id": "gen-007",
     "session_id": null,
-    "created_at": "2026-02-01T08:39:40.758718Z",
+    "created_at": "2026-02-01T09:30:57.837112Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -371,9 +424,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-007",
+    "incident_id": "gen-008",
     "session_id": null,
-    "created_at": "2026-02-01T08:40:10.675972Z",
+    "created_at": "2026-02-01T09:55:05.809423Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -424,9 +477,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-008",
+    "incident_id": "gen-009",
     "session_id": null,
-    "created_at": "2026-02-01T08:49:30.316638Z",
+    "created_at": "2026-02-01T10:01:48.354464Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -477,9 +530,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-009",
+    "incident_id": "gen-010",
     "session_id": null,
-    "created_at": "2026-02-01T09:15:56.755653Z",
+    "created_at": "2026-02-01T10:12:33.889113Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -530,9 +583,9 @@
   },
   {
     "schema_version": "1.0",
-    "incident_id": "gen-010",
+    "incident_id": "gen-011",
     "session_id": null,
-    "created_at": "2026-02-01T09:30:57.837112Z",
+    "created_at": "2026-02-01T10:40:35.539331Z",
     "source": "synthetic_generator",
     "location": {
       "raw_text": null,
@@ -576,375 +629,6 @@
       },
       "breathing_concern": {
         "value": "no",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-011",
-    "session_id": null,
-    "created_at": "2026-02-01T09:38:05.367991Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.24122,
-      "longitude": 6.79227
-    },
-    "incident": {
-      "description": "Severe asthma attack, person is gasping for air.",
-      "mechanism": null,
-      "type": "respiratory",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "abnormal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "shortness of breath",
-          "wheezing"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "respiratory",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "yes",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-012",
-    "session_id": null,
-    "created_at": "2026-02-01T09:46:04.069386Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.31241,
-      "longitude": 6.91198
-    },
-    "incident": {
-      "description": "Person suddenly collapsed and does not respond.",
-      "mechanism": null,
-      "type": "neurological",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "unconscious",
-        "breathing": "normal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "face drooping",
-          "unresponsive"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "neurological",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "yes",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "no",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-013",
-    "session_id": null,
-    "created_at": "2026-02-01T09:55:05.809423Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.19356,
-      "longitude": 6.87205
-    },
-    "incident": {
-      "description": "Person with chest pain is struggling to breathe.",
-      "mechanism": null,
-      "type": "cardiac_or_circulatory",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "abnormal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "chest pain",
-          "pale and sweating"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "cardiac_or_circulatory",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "yes",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-014",
-    "session_id": null,
-    "created_at": "2026-02-01T09:56:58.751928Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.31038,
-      "longitude": 6.93158
-    },
-    "incident": {
-      "description": "Cyclist hit by a car, heavy bleeding from the leg.",
-      "mechanism": "car collision",
-      "type": "trauma",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "normal",
-        "severe_bleeding": "present",
-        "symptoms": [
-          "leg injury"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "unknown"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "trauma",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "no",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-015",
-    "session_id": null,
-    "created_at": "2026-02-01T10:01:48.354464Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.20707,
-      "longitude": 6.60131
-    },
-    "incident": {
-      "description": "Person has chest pain but is breathing normally.",
-      "mechanism": null,
-      "type": "cardiac_or_circulatory",
-      "severity": "urgent"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "normal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "chest pain"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "cardiac_or_circulatory",
-        "confidence": null
-      },
-      "severity": {
-        "value": "urgent",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "no",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-016",
-    "session_id": null,
-    "created_at": "2026-02-01T10:12:33.889113Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.1968,
-      "longitude": 6.88033
-    },
-    "incident": {
-      "description": "Person with chest pain is struggling to breathe.",
-      "mechanism": null,
-      "type": "cardiac_or_circulatory",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "abnormal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "chest pain",
-          "pale and sweating"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "cardiac_or_circulatory",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "yes",
-        "confidence": null
-      }
-    },
-    "status": "ready_for_dispatch"
-  },
-  {
-    "schema_version": "1.0",
-    "incident_id": "gen-017",
-    "session_id": null,
-    "created_at": "2026-02-01T10:40:35.539331Z",
-    "source": "synthetic_generator",
-    "location": {
-      "raw_text": null,
-      "latitude": 52.19042,
-      "longitude": 6.84318
-    },
-    "incident": {
-      "description": "Severe asthma attack, person is gasping for air.",
-      "mechanism": null,
-      "type": "respiratory",
-      "severity": "critical"
-    },
-    "patients": {
-      "count": 1,
-      "primary_patient": {
-        "consciousness": "conscious",
-        "breathing": "abnormal",
-        "severe_bleeding": "absent",
-        "symptoms": [
-          "shortness of breath",
-          "wheezing"
-        ]
-      }
-    },
-    "scene": {
-      "entrapment": "not_relevant",
-      "immediate_danger": "not_relevant"
-    },
-    "classification": {
-      "incident_type": {
-        "value": "respiratory",
-        "confidence": null
-      },
-      "severity": {
-        "value": "critical",
-        "confidence": null
-      },
-      "consciousness_concern": {
-        "value": "no",
-        "confidence": null
-      },
-      "breathing_concern": {
-        "value": "yes",
         "confidence": null
       }
     },

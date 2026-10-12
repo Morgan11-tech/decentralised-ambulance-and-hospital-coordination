@@ -45,6 +45,7 @@ class Hospital(mesa.Agent):
         if not self.on_diversion and frac >= config.DIVERSION_THRESHOLD:
             self.on_diversion = True
             self.diversion_until = t + config.DIVERSION_DURATION_MIN
+            self.model.n_diversions += 1
             self.model.log(f"[divert] {self.name} ON diversion ({self.load}/{self.capacity})")
         elif self.on_diversion and (t >= self.diversion_until
                                     or frac <= config.DIVERSION_CLEAR_THRESHOLD):

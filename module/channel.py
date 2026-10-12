@@ -28,9 +28,11 @@ class Channel:
         self.loss_prob = loss_prob
         self.delay_ticks = delay_ticks
         self._queue = []          # (deliver_tick, message)
+        self.sent_counts = {}     # messages transmitted, by kind
 
     def send(self, msg):
         """Queue a message. Returns False if it was dropped (lost)."""
+        self.sent_counts[msg.kind] = self.sent_counts.get(msg.kind, 0) + 1
         if self.loss_prob > 0 and self.model.random.random() < self.loss_prob:
             return False
         self._queue.append((self.model.clock + self.delay_ticks, msg))

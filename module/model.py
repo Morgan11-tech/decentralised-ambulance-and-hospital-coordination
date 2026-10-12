@@ -17,6 +17,8 @@ import config
 from agents import Ambulance, Hospital
 from incidents import load_incidents
 from channel import Channel, Message
+from mesa.datacollection import DataCollector
+import metrics
 
 _PRIORITY = {"A0": 0, "A1": 1, "A2": 2, "B": 3}
 _LOG_CAP = 300
@@ -75,6 +77,18 @@ class EmergencyModel(mesa.Model):
         self._next_idx = 0
         self.active_incidents = []
         self.completed = []
+        self.busy_ticks = 0        # cumulative ambulance-ticks spent busy
+        self.n_diversions = 0      # count of hospital diversion onsets
+        self.metrics = {}
+        self.datacollector = DataCollector(model_reporters={
+            "completed": lambda m: len(m.completed),
+            "waiting": lambda m: len(m.active_incidents) + len(m.auctions),
+            "resp_mean": lambda m: m.metrics.get("resp_mean", float("nan")),
+            "resp_p95": lambda m: m.metrics.get("resp_p95", float("nan")),
+            "within15_pct": lambda m: m.metrics.get("within15_pct", float("nan")),
+            "utilization_pct": lambda m: m.metrics.get("utilization_pct", float("nan")),
+            "on_diversion": lambda m: sum(1 for h in m.hospital_agents if h.on_diversion),
+        })
 
         self.running = True
 
@@ -177,4 +191,7 @@ class EmergencyModel(mesa.Model):
         self.channel.deliver_due()      # AWARD messages -> inboxes (same tick at delay 0)
         for a in self.ambulances:
             a.step()
+        self.busy_ticks += sum(1 for a in self.ambulances if a.status != "IDLE")
         self.clock += 1
+        self.metrics = metrics.summary(self)
+        self.datacollector.collect(self)
