@@ -26,7 +26,6 @@ import math
 import os
 import re
 import sys
-import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -86,6 +85,10 @@ TOWNS = {
 PLACE_TIERS = (CAMPUS_BUILDINGS, CAMPUS, TOWNS)
 
 
+class VoiceIncidentError(Exception):
+    """The voice incident cannot be loaded or simulated; the message says why."""
+
+
 # --- loading ---------------------------------------------------------------------
 
 
@@ -96,11 +99,11 @@ def from_mongo(uri: str, incident_id: str | None) -> dict:
     if incident_id:
         doc = collection.find_one({"_id": incident_id}, {"incident": 1})
         if doc is None:
-            sys.exit(f"No incident {incident_id} in MongoDB.")
+            raise VoiceIncidentError(f"No incident {incident_id} in MongoDB.")
     else:
         doc = collection.find_one({}, {"incident": 1}, sort=[("created_at", -1)])
         if doc is None:
-            sys.exit("MongoDB has no incidents yet. Record one with the voice agent first.")
+            raise VoiceIncidentError("MongoDB has no incidents yet. Record one with the voice agent first.")
     return doc["incident"]
 
 
@@ -111,7 +114,7 @@ def from_file(path: str, incident_id: str | None) -> dict:
     if incident_id:
         records = [r for r in records if r.get("incident_id") == incident_id]
         if not records:
-            sys.exit(f"No incident {incident_id} in {path}.")
+            raise VoiceIncidentError(f"No incident {incident_id} in {path}.")
     return records[-1]
 
 
@@ -145,13 +148,20 @@ def prepare(record: dict, latlon: tuple[float, float] | None) -> dict:
     elif loc.get("latitude") is None or loc.get("longitude") is None:
         found = geocode(loc.get("raw_text"))
         if found is None:
-            sys.exit(
+            raise VoiceIncidentError(
                 f"Cannot place location {loc.get('raw_text')!r} on the map.\n"
                 "Pass --latlon LAT LON, or add the place to the tables in run_voice_incident.py."
             )
         loc["latitude"], loc["longitude"] = found
         print(f"Location {loc['raw_text']!r} -> ({found[0]}, {found[1]})")
     return record
+
+
+def check_simulable(voice: dict) -> None:
+    code = to_operational_code(voice["incident"]["severity"], voice["patients"]["primary_patient"]["breathing"])
+    if code == "B":
+        raise VoiceIncidentError(
+            "Severity is non_urgent (code B): the emergency model does not simulate planned transport.")
 
 
 # --- running -----------------------------------------------------------------------
@@ -162,37 +172,61 @@ def _post_name(pos) -> str:
                                                          config.POSTS_XY[n][1] - pos[1]))
 
 
-def run(mode: str, incident: dict, seed: int) -> dict:
-    # The model only loads incidents from a file, so hand it a throwaway one.
-    with tempfile.TemporaryDirectory() as tmp:
-        path = Path(tmp) / "incident.json"
-        path.write_text(json.dumps([incident]))
-        model = EmergencyModel(seed=seed, incident_file=str(path), mode=mode)
-    if not model.incidents:
-        sys.exit("The incident was not loaded by the model (see warnings above).")
-    tracked = model.incidents[0]
+class TrackedModel(EmergencyModel):
+    """EmergencyModel that follows its first incident (the voice incident) and
+    stops running once it is closed. Used by this script and by voice_app.py."""
 
-    unit = post = hospital = None
-    while model.clock < MAX_TICKS and not model.completed:
-        model.step()
-        for amb in model.ambulances:
-            if amb.current_incident is tracked:
-                if unit is None:
-                    unit, post = amb.unique_id, _post_name(amb.home_pos)
+    # Explicit keywords, not **kwargs: Mesa's SolaraViz Reset passes extra arguments
+    # (e.g. `scenario`) to any model whose __init__ accepts **kwargs.
+    def __init__(self, seed=config.SEED, mode=None, n_ambulances=None, loss_prob=None,
+                 delay_ticks=None, outage_start=0, outage_len=0, incidents=None):
+        super().__init__(seed=seed, mode=mode, n_ambulances=n_ambulances, loss_prob=loss_prob,
+                         delay_ticks=delay_ticks, outage_start=outage_start,
+                         outage_len=outage_len, incidents=incidents)
+        self.tracked = self.incidents[0] if self.incidents else None
+        self.tracked_amb = None
+        self.tracked_hospital = None
+
+    def step(self):
+        super().step()
+        if self.tracked is None:
+            self.running = False
+            return
+        for amb in self.ambulances:
+            if amb.current_incident is self.tracked:
+                self.tracked_amb = self.tracked_amb or amb
                 if amb.dest_hospital is not None:
-                    hospital = amb.dest_hospital.name
+                    self.tracked_hospital = amb.dest_hospital.name
+        if self.completed or self.clock >= MAX_TICKS:
+            self.running = False
 
-    return {
-        "mode": mode,
-        "code": tracked.code,
-        "assigned_after": None if tracked.assigned_tick is None else tracked.assigned_tick - tracked.created_tick,
-        "response": tracked.response_min,
-        "unit": f"amb#{unit} ({post})" if unit is not None else "none",
-        "transport": hospital or ("no transport" if tracked.closed_tick is not None else "-"),
-        "offload": tracked.offload_min,
-        "closed_after": None if tracked.closed_tick is None else tracked.closed_tick - tracked.created_tick,
-        "metrics": model.metrics,
-    }
+    def summary(self) -> dict:
+        inc, amb = self.tracked, self.tracked_amb
+
+        def after(tick):
+            return None if inc is None or tick is None else tick - inc.created_tick
+
+        return {
+            "mode": self.mode,
+            "code": inc.code if inc else None,
+            "assigned_after": after(inc.assigned_tick if inc else None),
+            "response": inc.response_min if inc else None,
+            "unit": f"amb#{amb.unique_id} ({_post_name(amb.home_pos)})" if amb is not None else "none",
+            "transport": self.tracked_hospital
+                         or ("no transport" if inc is not None and inc.closed_tick is not None else "-"),
+            "offload": inc.offload_min if inc else None,
+            "closed_after": after(inc.closed_tick if inc else None),
+            "metrics": self.metrics,
+        }
+
+
+def run(mode: str, incident: dict, seed: int) -> dict:
+    model = TrackedModel(seed=seed, mode=mode, incidents=[incident])
+    if model.tracked is None:
+        raise VoiceIncidentError("The incident was not loaded by the model (see warnings above).")
+    while model.running:
+        model.step()
+    return model.summary()
 
 
 def _fmt(v, unit=""):
@@ -241,16 +275,16 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=config.SEED)
     args = p.parse_args()
 
-    record = from_file(args.file, args.id) if args.file else from_mongo(args.mongo_uri, args.id)
-    validate(record)
-    voice = prepare(record, tuple(args.latlon) if args.latlon else None)
-
-    code = to_operational_code(voice["incident"]["severity"], voice["patients"]["primary_patient"]["breathing"])
-    if code == "B":
-        sys.exit("Severity is non_urgent (code B): the emergency model does not simulate planned transport.")
-
-    modes = ["centralized", "decentralized"] if args.mode == "both" else [args.mode]
-    report(voice, [run(m, voice, args.seed) for m in modes])
+    try:
+        record = from_file(args.file, args.id) if args.file else from_mongo(args.mongo_uri, args.id)
+        validate(record)
+        voice = prepare(record, tuple(args.latlon) if args.latlon else None)
+        check_simulable(voice)
+        modes = ["centralized", "decentralized"] if args.mode == "both" else [args.mode]
+        results = [run(m, voice, args.seed) for m in modes]
+    except VoiceIncidentError as e:
+        sys.exit(str(e))
+    report(voice, results)
 
 
 if __name__ == "__main__":

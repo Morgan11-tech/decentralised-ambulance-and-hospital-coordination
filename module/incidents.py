@@ -71,14 +71,19 @@ def _parse_dt(s: str) -> datetime:
 
 
 def load_incidents(path: str, seed: int = config.SEED, include_planned: bool = False):
-    """Load incident.json and return Incident objects sorted by created_tick.
+    """Load incident.json and return Incident objects sorted by created_tick."""
+    with open(path) as f:
+        raw = json.load(f)
+    return incidents_from_records(raw, seed=seed, include_planned=include_planned)
+
+
+def incidents_from_records(raw, seed: int = config.SEED, include_planned: bool = False):
+    """Turn schema records (one dict or a list) into Incident objects sorted by created_tick.
 
     seed -> reproducible on-scene times / transport outcomes (same stream for A and B).
     include_planned=False drops B (planned transport); it is not an emergency.
     """
     rng = random.Random(seed)
-    with open(path) as f:
-        raw = json.load(f)
     records = raw if isinstance(raw, list) else [raw]   # accept one or many
 
     times = [_parse_dt(r["created_at"]) for r in records if r.get("created_at")]

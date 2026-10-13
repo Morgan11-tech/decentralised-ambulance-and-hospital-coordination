@@ -15,7 +15,7 @@ import mesa
 
 import config
 from agents import Ambulance, Hospital
-from incidents import load_incidents
+from incidents import incidents_from_records, load_incidents
 from channel import Channel, Message
 from mesa.datacollection import DataCollector
 import metrics
@@ -27,7 +27,7 @@ _LOG_CAP = 300
 class EmergencyModel(mesa.Model):
     def __init__(self, seed=config.SEED, incident_file=None, mode=None,
                  n_ambulances=None, loss_prob=None, delay_ticks=None,
-                 outage_start=0, outage_len=0):
+                 outage_start=0, outage_len=0, incidents=None):
         super().__init__(rng=seed)
         self.mode = mode or config.MODE
         n_amb = n_ambulances or config.N_AMBULANCES
@@ -61,17 +61,21 @@ class EmergencyModel(mesa.Model):
             self.space.place_agent(amb, pos)
             self.ambulances.append(amb)
 
-        # Incidents.
-        path = incident_file or config.INCIDENT_FILE
-        if not os.path.exists(path):
-            fallback = "incident_sample.json"
-            if os.path.exists(fallback):
-                print(f"[warn] {path} not found; using {fallback}")
-                path = fallback
-            else:
-                print(f"[warn] no incident file found ({path}); running with no incidents")
-                path = None
-        self.incidents = load_incidents(path, seed=seed) if path else []
+        # Incidents: records passed in directly (e.g. one voice-agent incident)
+        # take precedence over the incident file.
+        if incidents is not None:
+            self.incidents = incidents_from_records(incidents, seed=seed)
+        else:
+            path = incident_file or config.INCIDENT_FILE
+            if not os.path.exists(path):
+                fallback = "incident_sample.json"
+                if os.path.exists(fallback):
+                    print(f"[warn] {path} not found; using {fallback}")
+                    path = fallback
+                else:
+                    print(f"[warn] no incident file found ({path}); running with no incidents")
+                    path = None
+            self.incidents = load_incidents(path, seed=seed) if path else []
 
         self.clock = 0
         self._next_idx = 0
@@ -89,6 +93,14 @@ class EmergencyModel(mesa.Model):
             "utilization_pct": lambda m: m.metrics.get("utilization_pct", float("nan")),
             "on_diversion": lambda m: sum(1 for h in m.hospital_agents if h.on_diversion),
         })
+
+        # Remember how this model was built, so the "compare modes" panel can
+        # rebuild BOTH conditions on the identical incidents and settings.
+        self._build_kwargs = dict(
+            seed=seed, incident_file=incident_file, n_ambulances=n_ambulances,
+            loss_prob=loss_prob, delay_ticks=delay_ticks,
+            outage_start=outage_start, outage_len=outage_len, incidents=incidents,
+        )
 
         self.running = True
 
