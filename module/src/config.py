@@ -32,7 +32,7 @@ N_MUNICIPALITIES = 14                         # [Ambulance Oost]
 # ---------------------------------------------------------------------------
 # Shared handoff location for the incident stream: the teammate's generator
 # writes here, the loader reads here. Override without editing code, e.g.:
-#   INCIDENT_FILE=data/incident_sample.json solara run app.py
+#   INCIDENT_FILE=data/incident_sample.json solara run apps/app.py
 INCIDENT_FILE = os.environ.get("INCIDENT_FILE", "data/incident.json")
 
 # ---------------------------------------------------------------------------
@@ -42,10 +42,30 @@ TICK_MINUTES = 1.0        # one tick = one minute; response times come out in mi
 
 # ---------------------------------------------------------------------------
 # Response-time norm (A1)  [RIVM/VZinfo]
-# 15 min target = 3 min call-handling/dispatch + 12 min net drive; 95% of A1 calls.
+# 15 min target = 3 min call-handling + turnout ("meld- en uitruktijd") + 12 min drive;
+# 95% of A1 calls.
 # ---------------------------------------------------------------------------
 A1_NORM_MIN = 15.0
-DISPATCH_HANDLING_MIN = 3.0
+# Call-processing latency, paid in EVERY mode: a call can be allocated (A) or announced for
+# bidding (B) only after this many minutes of processing; the unit starts moving when it is
+# assigned. In A the processing needs one of N_DISPATCH_OPERATORS (below), so calls can queue;
+# in B it runs in parallel for every call. This is the "PSAP to Unit Notified" interval [NASEMSO 2024].
+# Measured call-to-dispatch: mean 2.3 +/- 2 min (13 Italian dispatch centres, 1,041 stroke
+# calls) [Citerio 2006]; 2 min sits inside that range and inside the 3-min Dutch budget,
+# which also covers turnout [RIVM/VZinfo]. Turnout itself is not modelled. Can be swept.
+#   NASEMSO 2024  https://nemsis.org/wp-content/uploads/2024/06/NASEMSO_EMS_Time_Duration_Definitions-6-18-24.pdf
+#   Citerio 2006  https://doi.org/10.1136/emj.2005.032219
+DISPATCH_HANDLING_MIN = 2.0
+# Centralized only: call-takers/dispatchers on shift for Twente. Each holds one call for
+# DISPATCH_HANDLING_MIN; when all are busy, new calls wait, most urgent (A0, A1, A2) then
+# oldest first. Meldkamer Oost-Nederland (5 regions, incl. Twente; 3.2 M residents) staffs
+# its 112 ambulance team with 4 day / 4 evening / 3 night call-takers, "naar rato aangeleverd
+# door elk van de 5 regio's" [NAZ-MkON]. Twente's population share (639k / 3.2 M = 20%) gives
+# 0.6-0.8 -> 1. [ASSUMPTION: pro-rata share; in reality the room pools its team across the
+# 5 regions, so up to 4 can serve Twente] Swept in experiment E6 (1, 2, 3, 5, unlimited).
+#   NAZ-MkON  https://netwerkacutezorg.nl/werkbezoek-meldkamer-oost-nederland-een-kijkje-achter-de-schermen/
+# None = unlimited (the earlier model, where every call was processed at once).
+N_DISPATCH_OPERATORS = 1
 DRIVE_BUDGET_MIN = 12.0
 TARGET_PERCENTILE = 0.95
 
@@ -57,13 +77,13 @@ VALIDATION_P95_MIN_RANGE = (15.0, 17.0)
 # Fleet
 # ---------------------------------------------------------------------------
 FLEET_TOTAL = 32          # [Ambulance Oost] 25 ambulances + 5 care + 2 rapid responders
-N_AMBULANCES = 12         # [ASSUMPTION] concurrently-staffed A1 units; tune to hit the norm
+N_AMBULANCES = 13         # [ASSUMPTION] concurrently-staffed A1 units; calibrated by experiments/calibrate.py; see results/calibration_report.md
 
 # ---------------------------------------------------------------------------
 # Travel  [ASSUMPTION — calibrate so coverage ~98% within 15 min]
 # travel_time_min = (euclidean_km * DETOUR_FACTOR) / EFFECTIVE_SPEED_KMH * 60
 # ---------------------------------------------------------------------------
-EFFECTIVE_SPEED_KMH = 60.0
+EFFECTIVE_SPEED_KMH = 60.0   # [ASSUMPTION] calibrated by experiments/calibrate.py; see results/calibration_report.md
 DETOUR_FACTOR = 1.3
 
 # ---------------------------------------------------------------------------
@@ -118,7 +138,7 @@ COVERAGE_WITHIN_NORM = 0.981
 # servers reach capacity.  [server/LOS model: DES-lit — Sun 2016, Kolker 2008]
 # ---------------------------------------------------------------------------
 # Length of stay: how long an admitted patient occupies a server.
-HOSPITAL_LOS_MEAN_MIN = 210.0    # [ASSUMPTION ~3.5h] NL ED LOS is relatively short [NL-dashboard];
+HOSPITAL_LOS_MEAN_MIN = 195.0    # [ASSUMPTION] calibrated by experiments/calibrate.py; see results/calibration_report.md; NL ED LOS is relatively short [NL-dashboard];
                                  #   LOS->diversion link from Kolker 2008 [DES-lit]
 HOSPITAL_LOS_FLOOR_MIN = 60.0    # [ASSUMPTION] minimum stay
 
@@ -143,13 +163,32 @@ VALIDATION_OFFLOAD_RATE = 0.077  # [WAITED] 7.7% of arrivals met the offload-del
 # ---------------------------------------------------------------------------
 # Coordination / channel
 # ---------------------------------------------------------------------------
-MODE = "centralized"     # "centralized" or "decentralized"; the only switch between conditions
+MODE = "centralized"     # "centralized", "decentralized" (Contract Net, urgency-ordered), or "hybrid"
 BID_WINDOW_TICKS = 2     # [ASSUMPTION] ticks to collect bids before awarding (late bids missed)
+# A0 (immediate_dispatch) auctions close after 1 tick (or BID_WINDOW_TICKS if shorter), the
+# earliest tick at which any bid can have arrived. Stands in for "send the nearest unit now"
+# without giving the auctioneer a view of unit positions. [ASSUMPTION]
+IMMEDIATE_BID_WINDOW_TICKS = 1
+# Auction timing variants (options; not in the current experiment set). Defaults keep the original behaviour.
+# BID_WINDOW_KNOWS_DELAY: the auctioneer adds the channel's round trip (2 x DELAY_TICKS) to the
+#   window, i.e. it knows how late bids will be. False = a plain fixed timeout, as in Contract
+#   Net (Smith 1980), which misses bids that arrive after it.
+# AUCTION_EARLY_CLOSE: instead of a fixed window, close once bids have arrived and then a tick
+#   passes with no new bid, capped at AUCTION_MAX_WINDOW_TICKS. Assumes units answer promptly
+#   and bids arrive together (true here: every bid sees the same channel delay). [ASSUMPTION]
+BID_WINDOW_KNOWS_DELAY = True
+AUCTION_EARLY_CLOSE = False
+AUCTION_MAX_WINDOW_TICKS = 10   # [ASSUMPTION] cap for the early-close rule
 
 # Communication reliability (resilience stress knobs) — default to perfect comms.
 LOSS_PROB = 0.0
 DELAY_TICKS = 0
 DISPATCHER_OUTAGE = None  # e.g. (start_tick, end_tick) to block the dispatcher for a window
+# Hybrid mode ("hybrid"): centralized while the control room is up, Contract Net (Smith 1980)
+# while it is down. Detecting the outage and switching the fallback on (and back) is not instant:
+# units self-dispatch only in [outage start + delay, outage end + delay). 0 = perfect, instant
+# switch, i.e. the BEST case for the hybrid; swept in E4-switch. [ASSUMPTION]
+SWITCHOVER_DELAY_MIN = 0
 
 SEED = 42
 
@@ -175,8 +214,8 @@ POSTS_LATLON = {
 # ZGT Hengelo EXCLUDED: its ED closed in 2018. capacity = concurrent ED servers [ASSUMPTION].
 # ---------------------------------------------------------------------------
 HOSPITALS_LATLON = {
-    "MST Enschede": {"lat": 52.211, "lon": 6.881, "capacity": 8},  # large topclinical hospital
-    "ZGT Almelo":   {"lat": 52.345, "lon": 6.672, "capacity": 5},  # ~30k SEH visits/yr
+    "MST Enschede": {"lat": 52.211, "lon": 6.881, "capacity": 10},  # large topclinical hospital
+    "ZGT Almelo":   {"lat": 52.345, "lon": 6.672, "capacity": 6},  # ~30k SEH visits/yr
 }
 
 # ---------------------------------------------------------------------------
@@ -241,6 +280,15 @@ def travel_time_min(km):
 #     diversion). arXiv:2412.11257 (preprint).
 # [DES-lit] A Realistic DES model for Ambulance Location and Deployment within a
 #     regional EMS. arXiv:2604.24394 (preprint).
+# [TK-747] Tweede Kamer, Aanhangsel Handelingen 2025-2026 nr. 747 (19 Dec 2025):
+#     Twente A1 (incl. A0) dispatches 2024 = 23,238 -> 2.65 urgent calls/hour.
+#     Used for normal demand in experiment_core.py. https://berthub.eu/tkconv/getraw/2025D53564
+# [NAZ-MkON] Netwerk Acute Zorg regio Zwolle, "Werkbezoek meldkamer Oost-Nederland: een kijkje
+#     achter de schermen": 112 team 4/4/3 call-takers for 5 regions, 12,000 ambulance 112 calls/month.
+#     https://netwerkacutezorg.nl/werkbezoek-meldkamer-oost-nederland-een-kijkje-achter-de-schermen/
+# [Ballou] Ballou, Rahardja, Sakai (2002). Selected country circuity factors for road
+#     travel distance estimation. Transp. Res. A 36(9):843-848 (order of magnitude of DETOUR_FACTOR).
+# Calibration of the [ASSUMPTION] values: experiments/calibrate.py -> results/calibration_report.md.
 # NOTE: WAITED is single-centre; the dashboard study is national scope. The
 # server/LOS/threshold mechanics are DES/queueing concepts implemented here in a
 # tick-based ABM (our own design choice; no cited source is agent-based).

@@ -54,6 +54,7 @@ class Incident:
     immediate_dispatch: bool = False  # A0: skip bidding, send nearest now
     n_patients: int = 1
     # lifecycle timestamps (ticks), filled during the run
+    answered_tick: int | None = None   # call processing started (A: an operator picked it up)
     assigned_tick: int | None = None
     on_scene_tick: int | None = None
     closed_tick: int | None = None
@@ -77,17 +78,21 @@ def load_incidents(path: str, seed: int = config.SEED, include_planned: bool = F
     return incidents_from_records(raw, seed=seed, include_planned=include_planned)
 
 
-def incidents_from_records(raw, seed: int = config.SEED, include_planned: bool = False):
+def incidents_from_records(raw, seed: int = config.SEED, include_planned: bool = False, t0=None):
     """Turn schema records (one dict or a list) into Incident objects sorted by created_tick.
 
     seed -> reproducible on-scene times / transport outcomes (same stream for A and B).
     include_planned=False drops B (planned transport); it is not an emergency.
+    t0 = the moment that becomes tick 0 (a datetime). None = the earliest call, which suits a
+    single voice incident; generated streams pass their start time, so the clock covers the whole
+    generated period and is not shifted by when the first call happens to fall.
     """
     rng = random.Random(seed)
     records = raw if isinstance(raw, list) else [raw]   # accept one or many
 
     times = [_parse_dt(r["created_at"]) for r in records if r.get("created_at")]
-    t0 = min(times) if times else None                  # earliest call = tick 0
+    if t0 is None:
+        t0 = min(times) if times else None              # earliest call = tick 0
 
     incidents, skipped = [], 0
     for i, r in enumerate(records):
