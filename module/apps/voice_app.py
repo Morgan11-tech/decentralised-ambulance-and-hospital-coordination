@@ -6,10 +6,10 @@ shows its payload and how it is mapped into the model, then runs the model on
 that incident alone. Same loading path as run_voice_incident.py.
 
 Run:
-  solara run voice_app.py                                  # latest incident in MongoDB
-  INCIDENT_ID=INC-DD9ADB398988 solara run voice_app.py     # a specific one
-  VOICE_FILE=../conversational-agent/examples/sample_incident.json solara run voice_app.py
-  VOICE_LATLON=52.2393,6.8555 solara run voice_app.py      # override the location lookup
+  solara run apps/voice_app.py                                  # latest incident in MongoDB
+  INCIDENT_ID=INC-DD9ADB398988 solara run apps/voice_app.py     # a specific one
+  VOICE_FILE=../conversational-agent/examples/sample_incident.json solara run apps/voice_app.py
+  VOICE_LATLON=52.2393,6.8555 solara run apps/voice_app.py      # override the location lookup
 
 MONGODB_URI is read as in the CLI. Switch the dispatch mode in the sidebar and
 press Reset to replay the same incident under the other condition.
@@ -17,6 +17,12 @@ press Reset to replay the same incident under the other condition.
 
 import json
 import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+sys.path.insert(0, os.path.join(ROOT, "apps"))   # run_voice_incident
+os.chdir(ROOT)  # data/ and results/ paths are relative to the module root
 
 import solara
 from matplotlib.figure import Figure
@@ -129,7 +135,7 @@ model_params = {
     "incidents": [VOICE] if VOICE is not None else [],   # fixed: the voice incident only
     "mode": {"type": "Select", "value": "centralized",
              "values": ["centralized", "decentralized"], "label": "Dispatch mode"},
-    "n_ambulances": Slider("Ambulances", 12, 4, 24, 1),
+    "n_ambulances": Slider("Ambulances", config.N_AMBULANCES, 4, 24, 1),
     "loss_prob": Slider("Message loss probability", 0.0, 0.0, 0.5, 0.05),
     "delay_ticks": Slider("Message delay (min)", 0, 0, 5, 1),
     "seed": Slider("Random seed", config.SEED, 1, 100, 1),

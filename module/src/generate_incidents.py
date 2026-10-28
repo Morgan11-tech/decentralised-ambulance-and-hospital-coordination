@@ -5,7 +5,7 @@ Spreads incidents across Twente, weighted toward the cities, and writes an
 incident.json valid against conversational-agent/schemas/incident.schema.json.
 Deterministic given a seed, so experiments replay.
 
-Usage:  python generate_incidents.py --n 18 --minutes 180 --out data/incident.json
+Usage (from module/):  python src/generate_incidents.py --n 18 --minutes 180 --out data/incident.json
 """
 
 import argparse
@@ -118,11 +118,17 @@ def _sample_pos(rng):
     return config.xy_to_latlon(x, y)
 
 
-def generate(n=18, minutes=180, seed=config.SEED, out="data/incident.json"):
+# Start of every generated stream. Experiments pass it to the model as minute 0, so the run's clock
+# starts with the generated period, not at its (random) first call.
+BASE_TIME = datetime(2026, 2, 1, 8, 0, tzinfo=timezone.utc)
+
+
+def generate_records(n=18, minutes=180, seed=config.SEED):
+    """Return the incident records (no file written). Used by the batch experiments."""
     rng = random.Random(seed)
     codes = list(config.SEVERITY_MIX.keys())          # A0, A1, A2
     weights = list(config.SEVERITY_MIX.values())
-    base = datetime(2026, 2, 1, 8, 0, tzinfo=timezone.utc)
+    base = BASE_TIME
 
     offsets = sorted(rng.uniform(0, minutes) for _ in range(n))
     records = []
@@ -132,7 +138,11 @@ def generate(n=18, minutes=180, seed=config.SEED, out="data/incident.json"):
         lat, lon = _sample_pos(rng)
         created_at = (base + timedelta(minutes=off)).isoformat().replace("+00:00", "Z")
         records.append(_record(i, created_at, lat, lon, profile))
+    return records
 
+
+def generate(n=18, minutes=180, seed=config.SEED, out="data/incident.json"):
+    records = generate_records(n, minutes, seed)
     import os
     os.makedirs(os.path.dirname(out) or ".", exist_ok=True)
     with open(out, "w") as f:

@@ -27,6 +27,17 @@ _STATUS_COLOR = {
 _CODE_COLOR = {"A0": "red", "A1": "darkorange", "A2": "gold", "B": "gray"}
 
 
+def mode_label(model):
+    """Mode name; for the hybrid also which allocation is running this tick."""
+    if model.mode != "hybrid":
+        return model.mode
+    if model._self_dispatch_active():
+        return "hybrid: units bidding"
+    if not model._dispatcher_up():
+        return "hybrid: outage not yet noticed"
+    return "hybrid: dispatcher"
+
+
 def draw_scene(model, ax):
     # Ambulance posts: large light squares (so a parked ambulance sits inside).
     for name, (x, y) in config.POSTS_XY.items():
@@ -68,7 +79,7 @@ def draw_scene(model, ax):
     ax.set_ylabel("km")
     waiting = len(getattr(model, "active_incidents", []))
     done = len(getattr(model, "completed", []))
-    ax.set_title(f"Twente EMS ({model.mode})  |  t = {getattr(model, 'clock', 0)} min  |  "
+    ax.set_title(f"Twente EMS ({mode_label(model)})  |  t = {getattr(model, 'clock', 0)} min  |  "
                  f"waiting: {waiting}  done: {done}")
 
 

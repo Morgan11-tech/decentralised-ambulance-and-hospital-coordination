@@ -1,18 +1,28 @@
 """
 app.py — Local Solara web app for watching the simulation.
 
-Run:  solara run app.py   (then open the printed URL and press play)
+Run (from module/):  solara run apps/app.py   (then open the printed URL and press play)
 
-The map and panels live in viz.py (shared with voice_app.py). The CompareModes
+The map and panels live in src/viz.py (shared with voice_app.py). The CompareModes
 panel below is specific to the experiment page: it is HIDDEN behind a button and,
 when opened, runs BOTH dispatch modes on the identical incidents and settings so
-you can compare them without switching mode.
+you can compare them without switching mode. With a dispatcher outage set, the
+hybrid (centralized, units bid while the dispatcher is down) is added as a third
+mode; the map title shows which allocation the hybrid is using at each tick.
 """
+
+import os
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "src"))
+os.chdir(ROOT)  # data/ and results/ paths are relative to the module root
 
 import solara
 from matplotlib.figure import Figure
 from mesa.visualization import SolaraViz, Slider
 
+import config
 import metrics
 from model import EmergencyModel
 from viz import LogPanel, MetricsChart, MetricsPanel, TwenteSpace
@@ -52,7 +62,10 @@ def CompareModes(model):
     def both():
         if not show.value:
             return None                      # do nothing while collapsed
-        return {m: _run_to_end(m, kwargs) for m in ("centralized", "decentralized")}
+        modes = ["centralized", "decentralized"]
+        if kwargs.get("outage_len"):                 # the hybrid only differs during an outage
+            modes.append("hybrid")
+        return {m: _run_to_end(m, kwargs) for m in modes}
 
     results = solara.use_memo(both, [key, show.value])
 
@@ -64,28 +77,32 @@ def CompareModes(model):
     if not show.value or results is None:
         return
 
-    cent_s, cent_df = results["centralized"]
-    dec_s, dec_df = results["decentralized"]
+    colors = {"centralized": "tab:blue", "decentralized": "tab:purple", "hybrid": "tab:green"}
+    modes = list(results)
 
     fig = Figure(figsize=(6.0, 5.2))
     ax1, ax2 = fig.subplots(2, 1)
 
-    # (1) response p95 over time, both modes
-    ax1.plot(cent_df.index, cent_df["resp_p95"], color="tab:blue", lw=1.6, label="centralized")
-    ax1.plot(dec_df.index, dec_df["resp_p95"], color="tab:purple", lw=1.6, label="decentralized")
+    # (1) response p95 over time, all modes
+    for m in modes:
+        ax1.plot(results[m][1].index, results[m][1]["resp_p95"], color=colors[m], lw=1.6, label=m)
+    if kwargs.get("outage_len"):
+        s0 = kwargs.get("outage_start", 0)
+        ax1.axvspan(s0, s0 + kwargs["outage_len"], color="gray", alpha=0.12, lw=0)
     ax1.axhline(15, color="gray", ls="--", lw=0.8, alpha=0.6)   # the 15-min norm
     ax1.set_xlabel("time (min)")
     ax1.set_ylabel("response p95 (min)")
     ax1.legend(fontsize=7)
-    ax1.set_title("Response p95 over time — both modes")
+    ax1.set_title("Response p95 over time (grey = dispatcher outage)")
 
     # (2) final response times, grouped bars (same unit: minutes)
     labels = ["p95 (min)", "mean (min)"]
-    cent_vals = [cent_s.get("resp_p95", float("nan")), cent_s.get("resp_mean", float("nan"))]
-    dec_vals = [dec_s.get("resp_p95", float("nan")), dec_s.get("resp_mean", float("nan"))]
     x = range(len(labels))
-    ax2.bar([i - 0.18 for i in x], cent_vals, 0.36, color="tab:blue", label="centralized")
-    ax2.bar([i + 0.18 for i in x], dec_vals, 0.36, color="tab:purple", label="decentralized")
+    w = 0.72 / len(modes)
+    for k, m in enumerate(modes):
+        s_ = results[m][0]
+        vals = [s_.get("resp_p95", float("nan")), s_.get("resp_mean", float("nan"))]
+        ax2.bar([i + (k - (len(modes) - 1) / 2) * w for i in x], vals, w, color=colors[m], label=m)
     ax2.set_xticks(list(x))
     ax2.set_xticklabels(labels)
     ax2.legend(fontsize=7)
@@ -95,9 +112,9 @@ def CompareModes(model):
 
     # compact side-by-side table of the headline numbers
     def row(label, key_, pct=False):
-        cv, dv = cent_s.get(key_, float("nan")), dec_s.get(key_, float("nan"))
         suf = "%" if pct else ""
-        return f"| {label} | {_fmt(cv)}{suf} | {_fmt(dv)}{suf} |"
+        return f"| {label} | " + " | ".join(f"{_fmt(results[m][0].get(key_, float('nan')))}{suf}"
+                                             for m in modes) + " |"
     table = "\n".join([
         row("Response p95 (min)", "resp_p95"),
         row("Response mean (min)", "resp_mean"),
@@ -109,19 +126,21 @@ def CompareModes(model):
     ])
     solara.Markdown(
         "#### Compare modes (same incidents & settings)\n"
-        "| metric | centralized | decentralized |\n|---|---|---|\n" + table
+        "| metric | " + " | ".join(modes) + " |\n|" + "---|" * (len(modes) + 1) + "\n" + table
     )
 
 
 # Interactive knobs (change, then press Reset to apply).
 model_params = {
     "mode": {"type": "Select", "value": "centralized",
-             "values": ["centralized", "decentralized"], "label": "Dispatch mode"},
-    "n_ambulances": Slider("Ambulances", 12, 4, 24, 1),
+             "values": ["centralized", "decentralized", "hybrid"], "label": "Dispatch mode"},
+    "n_ambulances": Slider("Ambulances", config.N_AMBULANCES, 4, 24, 1),
+    "n_operators": Slider("Dispatch operators (centralized)", config.N_DISPATCH_OPERATORS or 1, 1, 10, 1),
     "loss_prob": Slider("Message loss probability", 0.0, 0.0, 0.5, 0.05),
     "delay_ticks": Slider("Message delay (min)", 0, 0, 5, 1),
     "outage_start": Slider("Dispatcher outage start (min)", 0, 0, 200, 10),
     "outage_len": Slider("Dispatcher outage length (min, 0 = off)", 0, 0, 120, 10),
+    "switchover_delay": Slider("Hybrid: minutes to notice outage / recovery", config.SWITCHOVER_DELAY_MIN, 0, 15, 1),
     "seed": Slider("Random seed", 42, 1, 100, 1),
 }
 

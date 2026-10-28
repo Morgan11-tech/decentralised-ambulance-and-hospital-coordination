@@ -55,11 +55,12 @@ class Hospital(mesa.Agent):
 
 
 class Ambulance(mesa.Agent):
-    def __init__(self, model, home_pos, speed_kmh=config.EFFECTIVE_SPEED_KMH):
+    def __init__(self, model, home_pos, speed_kmh=None):
         super().__init__(model)
         self.home_pos = home_pos
         self.target = None
-        self.speed_kmh = speed_kmh
+        # read at construction (not import) time, so calibration/experiments can override it
+        self.speed_kmh = config.EFFECTIVE_SPEED_KMH if speed_kmh is None else speed_kmh
         self.status = "IDLE"
         self.current_incident = None
         self.dest_hospital = None
@@ -121,7 +122,8 @@ class Ambulance(mesa.Agent):
                 d = math.hypot(inc.pos[0] - self.pos[0], inc.pos[1] - self.pos[1])
                 eta = config.travel_time_min(d)
                 self.model.channel.send(Message("BID", sender=self, recipient=self.model,
-                                                incident=inc, payload={"eta": eta, "amb": self}))
+                                                incident=inc, payload={"eta": eta, "amb": self,
+                                                                       "auction": msg.payload.get("auction")}))
         self.inbox.clear()
 
         inc = self.current_incident

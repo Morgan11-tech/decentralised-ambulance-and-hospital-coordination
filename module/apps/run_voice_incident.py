@@ -10,11 +10,11 @@ The coordination mode is the experimental condition, not a property of the
 incident, so by default the incident is simulated under BOTH modes.
 
 Usage:
-  python run_voice_incident.py                        # latest incident in MongoDB, both modes
-  python run_voice_incident.py --id INC-DD9ADB398988  # a specific one
-  python run_voice_incident.py --file ../conversational-agent/examples/sample_incident.json
-  python run_voice_incident.py --mode decentralized
-  python run_voice_incident.py --latlon 52.2393 6.8555  # override the location lookup
+  python apps/run_voice_incident.py                        # latest incident in MongoDB, both modes
+  python apps/run_voice_incident.py --id INC-DD9ADB398988  # a specific one
+  python apps/run_voice_incident.py --file ../conversational-agent/examples/sample_incident.json
+  python apps/run_voice_incident.py --mode decentralized
+  python apps/run_voice_incident.py --latlon 52.2393 6.8555  # override the location lookup
 """
 
 from __future__ import annotations
@@ -29,13 +29,15 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-os.chdir(HERE)  # model/config use paths relative to module/
+ROOT = HERE.parent                       # module/
+sys.path.insert(0, str(ROOT / "src"))
+os.chdir(ROOT)  # model/config use paths relative to module/
 
 import config  # noqa: E402
 from incidents import to_operational_code  # noqa: E402
 from model import EmergencyModel  # noqa: E402
 
-SCHEMA_PATH = HERE.parent / "conversational-agent" / "schemas" / "incident.schema.json"
+SCHEMA_PATH = ROOT.parent / "conversational-agent" / "schemas" / "incident.schema.json"
 MAX_TICKS = 24 * 60
 
 # Free-text location -> (lat, lon). The voice agent stores only what the caller
@@ -179,10 +181,10 @@ class TrackedModel(EmergencyModel):
     # Explicit keywords, not **kwargs: Mesa's SolaraViz Reset passes extra arguments
     # (e.g. `scenario`) to any model whose __init__ accepts **kwargs.
     def __init__(self, seed=config.SEED, mode=None, n_ambulances=None, loss_prob=None,
-                 delay_ticks=None, outage_start=0, outage_len=0, incidents=None):
+                 delay_ticks=None, outage_start=0, outage_len=0, incidents=None, n_operators=None):
         super().__init__(seed=seed, mode=mode, n_ambulances=n_ambulances, loss_prob=loss_prob,
                          delay_ticks=delay_ticks, outage_start=outage_start,
-                         outage_len=outage_len, incidents=incidents)
+                         outage_len=outage_len, incidents=incidents, n_operators=n_operators)
         self.tracked = self.incidents[0] if self.incidents else None
         self.tracked_amb = None
         self.tracked_hospital = None
